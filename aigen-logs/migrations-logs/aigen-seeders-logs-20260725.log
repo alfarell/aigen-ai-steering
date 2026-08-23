@@ -1,0 +1,214 @@
+[aigen] 🔗 Connected to database: aigen
+[aigen] Running 17 seed file(s)...
+[aigen] 🌱 00000000000001_config_auto_po_add_new_condition.sql
+
+  📊 Result Set 00000000000001_config_auto_po_add_new_condition.sql:
+[
+  {
+    message: 'Successfully added Auto PO configuration data',
+    rows_inserted: 0,
+    rows_skipped_duplicates: 10
+  }
+]
+[aigen] ✅ 00000000000001_config_auto_po_add_new_condition.sql succeeded
+
+[aigen] 🌱 00000000000002_config_auto_po_rename_conditions.sql
+
+  📊 Result Set 00000000000002_config_auto_po_rename_conditions.sql:
+[
+  {
+    message: 'Successfully renamed config conditions for Auto PO',
+    'SLA_DIC_confirmation_Reminder -> DIC_Email_Reminder_interval': 0,
+    'SLA_DIC_confirmation_days -> Waiting_DIC_review_expiry': 0,
+    'SLA_Vendor_confirmation_days -> Waiting_vendor_expiry': 0,
+    total_rows_updated: 0
+  }
+]
+[aigen] ✅ 00000000000002_config_auto_po_rename_conditions.sql succeeded
+
+[aigen] 🌱 00000000000003_init_role.sql
+
+  📊 Result Set 00000000000003_init_role.sql:
+[
+  {
+    message: 'Successfully added initial role data',
+    rows_inserted: 0,
+    rows_skipped_duplicates: 5
+  }
+]
+[aigen] ✅ 00000000000003_init_role.sql succeeded
+
+[aigen] 🌱 00000000000004_init_permission.sql
+
+  📊 Result Set 00000000000004_init_permission.sql:
+[
+  {
+    message: 'Successfully added initial permission data',
+    rows_inserted: 0,
+    rows_skipped_duplicates: 12
+  }
+]
+[aigen] ✅ 00000000000004_init_permission.sql succeeded
+
+[aigen] 🌱 00000000000005_init_role_permissions.sql
+
+  📊 Result Set 00000000000005_init_role_permissions.sql:
+[
+  {
+    message: 'Successfully assigned permissions to admin role',
+    rows_inserted: 0,
+    rows_skipped_duplicates: 45,
+    total_active_permissions: 45
+  }
+]
+[aigen] ✅ 00000000000005_init_role_permissions.sql succeeded
+
+[aigen] 🌱 00000000000006_assign_admin_role.sql
+
+  📊 Result Set 00000000000006_assign_admin_role.sql:
+[
+  {
+    status: 'Assignment already exists',
+    user_id: 1,
+    role_id: 1,
+    message: 'No action taken'
+  }
+]
+[aigen] ✅ 00000000000006_assign_admin_role.sql succeeded
+
+[aigen] 🌱 20260127163726_add_milestone_management_approval.sql
+
+  📊 Result Set 20260127163726_add_milestone_management_approval.sql:
+[
+  {
+    message: 'Successfully added new status milestone',
+    rows_inserted: 0,
+    rows_skipped_duplicates: 1
+  }
+]
+[aigen] ✅ 20260127163726_add_milestone_management_approval.sql succeeded
+
+[aigen] 🌱 20260206120000_add_milestone_waiting_management_approval.sql
+
+  📊 Result Set 20260206120000_add_milestone_waiting_management_approval.sql:
+[
+  {
+    message: 'Successfully added new status milestone',
+    rows_inserted: 0,
+    rows_skipped_duplicates: 1
+  }
+]
+[aigen] ✅ 20260206120000_add_milestone_waiting_management_approval.sql succeeded
+
+[aigen] 🌱 20260220135116_add_categories_parent_name.sql
+
+  📊 Result Set 20260220135116_add_categories_parent_name.sql:
+[
+  {
+    message: 'Successfully added categories group code',
+    rows_inserted: 0,
+    rows_skipped_duplicates: 8
+  }
+]
+[aigen] ✅ 20260220135116_add_categories_parent_name.sql succeeded
+
+[aigen] 🌱 20260224100625_add_initial_data_config_reason.sql
+
+  📊 Result Set 20260224100625_add_initial_data_config_reason.sql:
+[
+  {
+    message: 'Successfully added initial data config_reason',
+    rows_inserted: 12,
+    rows_skipped_duplicates: 0
+  }
+]
+[aigen] ✅ 20260224100625_add_initial_data_config_reason.sql succeeded
+
+[aigen] 🌱 20260318102627_add-milestone-failed-manual-sourcing.sql
+
+  📊 Result Set 20260318102627_add-milestone-failed-manual-sourcing.sql:
+[
+  {
+    message: 'Successfully added new status milestone',
+    rows_inserted: 0,
+    rows_skipped_duplicates: 1
+  }
+]
+[aigen] ✅ 20260318102627_add-milestone-failed-manual-sourcing.sql succeeded
+
+[aigen] 🌱 20260406135215_add-sub_categories.sql
+
+  📊 Result Set 20260406135215_add-sub_categories.sql:
+[
+  {
+    message: 'Successfully added sub-categories',
+    rows_inserted: 24,
+    rows_skipped_duplicates: 0
+  }
+]
+[aigen] ✅ 20260406135215_add-sub_categories.sql succeeded
+
+[aigen] 🌱 20260406140454_add-category_matrices.sql
+
+  📊 Result Set 20260406140454_add-category_matrices.sql:
+[
+  {
+    message: 'Successfully added category matrices',
+    rows_inserted: 24
+  }
+]
+[aigen] ✅ 20260406140454_add-category_matrices.sql succeeded
+
+[aigen] 🌱 20260421111545_duplicate-bcg-config-to-gems.sql
+
+  📊 Result Set 20260421111545_duplicate-bcg-config-to-gems.sql:
+[
+  {
+    message: 'Successfully duplicated BCG config to GEMS',
+    total_active_bcg_configs: 21,
+    rows_inserted: 1,
+    rows_skipped_already_exist_in_gems: 20
+  }
+]
+[aigen] ✅ 20260421111545_duplicate-bcg-config-to-gems.sql succeeded
+
+[aigen] 🌱 20260505034800_update-gems-config-src-value-to-value-idr.sql
+
+  📊 Result Set 20260505034800_update-gems-config-src-value-to-value-idr.sql:
+[
+  {
+    message: 'Successfully updated GEMS config src_value to value_idr',
+    rows_updated: 1,
+    pre_existing_value_idr: 2,
+    rows_skipped_already_converted: 3,
+    active: 1
+  }
+]
+[aigen] ✅ 20260505034800_update-gems-config-src-value-to-value-idr.sql succeeded
+
+[aigen] 🌱 20260512141526_seed-material-assignments-from-vendor-matriks-assign.sql
+
+  📊 Result Set 20260512141526_seed-material-assignments-from-vendor-matriks-assign.sql:
+[
+  {
+    legacy_rows: 488,
+    mat_group_count: 120,
+    ext_count: 488,
+    aggregate_count: 488
+  }
+]
+[aigen] ✅ 20260512141526_seed-material-assignments-from-vendor-matriks-assign.sql succeeded
+
+[aigen] 🌱 20260722100000_add_gems_manual_po_pilot_config.sql
+
+  📊 Result Set 20260722100000_add_gems_manual_po_pilot_config.sql:
+[
+  {
+    message: 'Successfully added GEMS Manual PO pilot milestone',
+    rows_inserted: 1,
+    rows_skipped_duplicates: 0
+  }
+]
+[aigen] ✅ 20260722100000_add_gems_manual_po_pilot_config.sql succeeded
+
+[aigen] ✅ Done

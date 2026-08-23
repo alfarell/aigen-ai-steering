@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_00003_create_table_user_down_sql", "label": "00003-create-table-user.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/00003-create-table-user.down.sql", "source_location": null}], "edges": []}

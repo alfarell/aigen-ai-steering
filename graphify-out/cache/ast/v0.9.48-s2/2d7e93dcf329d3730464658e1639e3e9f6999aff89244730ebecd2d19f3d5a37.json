@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_20260318170934_create_table_material_assignment_down_sql", "label": "20260318170934-create-table-material-assignment.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/20260318170934-create-table-material-assignment.down.sql", "source_location": null}], "edges": []}

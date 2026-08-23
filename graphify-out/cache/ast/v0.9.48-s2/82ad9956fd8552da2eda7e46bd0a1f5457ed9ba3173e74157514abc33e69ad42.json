@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_20260224094207_add_table_config_reason_down_sql", "label": "20260224094207-add-table-config-reason.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/20260224094207-add-table-config-reason.down.sql", "source_location": null}], "edges": []}

@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_20260303100000_create_material_groups_table_down_sql", "label": "20260303100000-create-material-groups-table.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/20260303100000-create-material-groups-table.down.sql", "source_location": null}], "edges": []}

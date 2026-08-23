@@ -1,0 +1,1214 @@
+{
+  "generated_at": "2026-07-31T02:18:20.492Z",
+  "mode": "read-only-repair-review",
+  "operation_id": "3e191f03-b879-4bbc-b0fe-a2e156a76e98",
+  "environment": "local",
+  "operator": "codex-local-canary",
+  "backup_reference": "20260731-local-B1200027667-private-full-backup.json",
+  "production_mutation_authorized": false,
+  "pr_numbers": [
+    "B1200027667"
+  ],
+  "evidence_fingerprint": "b7c1d46d85ab97b1645262fbe4bdfcad88a162a5c8ec08503f6700070dd40a3d",
+  "reviews": [
+    {
+      "pr_number": "B1200027667",
+      "recommendation": "BLOCKED_LIFECYCLE_REVIEW",
+      "item_card_ids": [
+        66245
+      ],
+      "blockers": [
+        "Review required for: AMBIGUOUS_LIFECYCLE."
+      ],
+      "classifications": [
+        "AMBIGUOUS_LIFECYCLE",
+        "CONSISTENT"
+      ],
+      "evidence_ids": {
+        "board_cards": [
+          115704,
+          115760,
+          115761,
+          123943,
+          123944
+        ],
+        "item_cards": [
+          66238,
+          66239,
+          66240,
+          66241,
+          66242,
+          66243,
+          66244,
+          66245
+        ],
+        "exports": [
+          1100030121,
+          1100031021,
+          1100031022,
+          1100031023,
+          1100031024,
+          1100031025,
+          1100031026,
+          1100031027,
+          1100031028
+        ],
+        "counters": [
+          40721,
+          40753,
+          45421
+        ],
+        "pr_logs": [
+          94564,
+          95449,
+          95450,
+          95451,
+          95452,
+          95453,
+          95454,
+          95455,
+          95456
+        ],
+        "assignment_history": [
+          92782,
+          92858,
+          93103,
+          92783,
+          92859,
+          92784,
+          92860,
+          92785,
+          92861,
+          93104,
+          92786,
+          92862,
+          93105,
+          92787,
+          92863,
+          93106,
+          92788,
+          92864,
+          92789,
+          109698
+        ],
+        "cs_reports": [
+          61884,
+          61885,
+          61886,
+          61887,
+          61888,
+          61889,
+          61890
+        ]
+      }
+    }
+  ],
+  "reconciliation": {
+    "generated_at": "2026-07-31T02:18:20.665Z",
+    "mode": "read-only",
+    "filters": {
+      "prNumbers": [
+        "B1200027667"
+      ]
+    },
+    "summary": {
+      "scanned_prs": 1,
+      "scanned_items": 8,
+      "classifications": {
+        "NO_CARD_ANY_STATE": 0,
+        "MISSING_ACTIVE_CARD": 0,
+        "VALID_TERMINAL_SPLIT_ONLY": 0,
+        "ROUTING_MISMATCH": 0,
+        "HEADER_ONLY": 0,
+        "DUPLICATE_ITEM": 0,
+        "DUPLICATE_ACTIVE_CARD": 0,
+        "STALE_EXPORT_CARD_REFERENCE": 0,
+        "CONSISTENT": 1,
+        "AMBIGUOUS_LIFECYCLE": 7
+      },
+      "health": {
+        "no_card_any_state": 0,
+        "source_marked_isourcing_missing_target": 0,
+        "possible_primary_update_retry": 0
+      }
+    },
+    "findings": [
+      {
+        "classification": "AMBIGUOUS_LIFECYCLE",
+        "card_title": "B1200027667",
+        "item_code": "1",
+        "source_rfq_item_ids": [
+          3628,
+          3684
+        ],
+        "rfq_numbers": [
+          "RFQ0001238"
+        ],
+        "item_card_ids": [
+          66238
+        ],
+        "board_card_ids": [
+          115704,
+          123943,
+          123944
+        ],
+        "export_ids": [],
+        "reason": "Terminal item coexists with active cards."
+      },
+      {
+        "classification": "AMBIGUOUS_LIFECYCLE",
+        "card_title": "B1200027667",
+        "item_code": "2",
+        "source_rfq_item_ids": [
+          3627,
+          3683
+        ],
+        "rfq_numbers": [
+          "RFQ0001238"
+        ],
+        "item_card_ids": [
+          66239
+        ],
+        "board_card_ids": [
+          115704,
+          123943,
+          123944
+        ],
+        "export_ids": [],
+        "reason": "Terminal item coexists with active cards."
+      },
+      {
+        "classification": "AMBIGUOUS_LIFECYCLE",
+        "card_title": "B1200027667",
+        "item_code": "3",
+        "source_rfq_item_ids": [
+          3682,
+          3626
+        ],
+        "rfq_numbers": [
+          "RFQ0001238"
+        ],
+        "item_card_ids": [
+          66240
+        ],
+        "board_card_ids": [
+          115704,
+          123943,
+          123944
+        ],
+        "export_ids": [],
+        "reason": "Terminal item coexists with active cards."
+      },
+      {
+        "classification": "AMBIGUOUS_LIFECYCLE",
+        "card_title": "B1200027667",
+        "item_code": "4",
+        "source_rfq_item_ids": [
+          3625,
+          3681
+        ],
+        "rfq_numbers": [
+          "RFQ0001238"
+        ],
+        "item_card_ids": [
+          66241
+        ],
+        "board_card_ids": [
+          115704,
+          123943,
+          123944
+        ],
+        "export_ids": [],
+        "reason": "Terminal item coexists with active cards."
+      },
+      {
+        "classification": "AMBIGUOUS_LIFECYCLE",
+        "card_title": "B1200027667",
+        "item_code": "5",
+        "source_rfq_item_ids": [
+          3624,
+          3680
+        ],
+        "rfq_numbers": [
+          "RFQ0001238"
+        ],
+        "item_card_ids": [
+          66242
+        ],
+        "board_card_ids": [
+          115704,
+          123943,
+          123944
+        ],
+        "export_ids": [],
+        "reason": "Terminal item coexists with active cards."
+      },
+      {
+        "classification": "AMBIGUOUS_LIFECYCLE",
+        "card_title": "B1200027667",
+        "item_code": "6",
+        "source_rfq_item_ids": [
+          3623,
+          3679
+        ],
+        "rfq_numbers": [
+          "RFQ0001238"
+        ],
+        "item_card_ids": [
+          66243
+        ],
+        "board_card_ids": [
+          115704,
+          123943,
+          123944
+        ],
+        "export_ids": [],
+        "reason": "Terminal item coexists with active cards."
+      },
+      {
+        "classification": "AMBIGUOUS_LIFECYCLE",
+        "card_title": "B1200027667",
+        "item_code": "7",
+        "source_rfq_item_ids": [
+          3678,
+          3622
+        ],
+        "rfq_numbers": [
+          "RFQ0001238"
+        ],
+        "item_card_ids": [
+          66244
+        ],
+        "board_card_ids": [
+          115704,
+          123943,
+          123944
+        ],
+        "export_ids": [],
+        "reason": "Terminal item coexists with active cards."
+      },
+      {
+        "classification": "CONSISTENT",
+        "card_title": "B1200027667",
+        "item_code": "8",
+        "source_rfq_item_ids": [
+          3629,
+          3685
+        ],
+        "rfq_numbers": [
+          "RFQ0001239"
+        ],
+        "item_card_ids": [
+          66245
+        ],
+        "board_card_ids": [
+          123944
+        ],
+        "export_ids": [
+          1100031028
+        ],
+        "reason": "Item lifecycle, routing, and export reference are consistent."
+      }
+    ]
+  },
+  "evidence": {
+    "board_cards": [
+      {
+        "id": 115704,
+        "board_id": 1,
+        "user_id": 1,
+        "list_id": 1,
+        "card_title": "B1200027667",
+        "pr_company_groups": "BCG",
+        "complete": "0",
+        "split_from": null,
+        "split_no": null,
+        "split_for": null,
+        "is_updated": 0,
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T01:00:35.000Z"
+      },
+      {
+        "id": 115760,
+        "board_id": 4,
+        "user_id": 4,
+        "list_id": 597,
+        "card_title": "B1200027667",
+        "pr_company_groups": "BCG",
+        "complete": "6",
+        "split_from": "pr_item",
+        "split_no": 2,
+        "split_for": "CS",
+        "is_updated": 0,
+        "created_at": "2026-05-12T05:43:55.000Z",
+        "updated_at": "2026-07-01T23:15:05.000Z"
+      },
+      {
+        "id": 115761,
+        "board_id": 72,
+        "user_id": 72,
+        "list_id": 599,
+        "card_title": "B1200027667",
+        "pr_company_groups": "BCG",
+        "complete": "6",
+        "split_from": "pr_item",
+        "split_no": 2,
+        "split_for": "CS",
+        "is_updated": 0,
+        "created_at": "2026-05-12T05:43:55.000Z",
+        "updated_at": "2026-07-01T23:15:05.000Z"
+      },
+      {
+        "id": 123943,
+        "board_id": 1,
+        "user_id": 1,
+        "list_id": 5,
+        "card_title": "B1200027667",
+        "pr_company_groups": "BCG",
+        "complete": "0",
+        "split_from": "pr_item",
+        "split_no": null,
+        "split_for": "CL",
+        "is_updated": 0,
+        "created_at": "2026-07-31T02:18:19.000Z",
+        "updated_at": "2026-07-31T02:18:19.000Z"
+      },
+      {
+        "id": 123944,
+        "board_id": 65,
+        "user_id": 65,
+        "list_id": 112,
+        "card_title": "B1200027667",
+        "pr_company_groups": "BCG",
+        "complete": "0",
+        "split_from": "pr_item",
+        "split_no": 3,
+        "split_for": "CL",
+        "is_updated": 1,
+        "created_at": "2026-07-31T02:18:19.000Z",
+        "updated_at": "2026-07-31T02:18:19.000Z"
+      }
+    ],
+    "item_cards": [
+      {
+        "id": 66238,
+        "pr_number": "B1200027667",
+        "item_code": "1",
+        "assigned_to_cl": 4,
+        "assigned_to_cs": 72,
+        "send_email_to": 72,
+        "item_complete": "1",
+        "is_updated": 1,
+        "is_delete": 0,
+        "pr_material_group_number": "8000",
+        "created_at": "2026-05-12T07:16:12.000Z",
+        "updated_at": "2026-05-12T07:16:12.000Z"
+      },
+      {
+        "id": 66239,
+        "pr_number": "B1200027667",
+        "item_code": "2",
+        "assigned_to_cl": 4,
+        "assigned_to_cs": 72,
+        "send_email_to": 72,
+        "item_complete": "6",
+        "is_updated": 1,
+        "is_delete": 0,
+        "pr_material_group_number": "8000",
+        "created_at": "2026-07-01T23:15:05.000Z",
+        "updated_at": "2026-07-01T23:15:05.000Z"
+      },
+      {
+        "id": 66240,
+        "pr_number": "B1200027667",
+        "item_code": "3",
+        "assigned_to_cl": 4,
+        "assigned_to_cs": 72,
+        "send_email_to": 72,
+        "item_complete": "6",
+        "is_updated": 1,
+        "is_delete": 0,
+        "pr_material_group_number": "8000",
+        "created_at": "2026-07-01T23:15:05.000Z",
+        "updated_at": "2026-07-01T23:15:05.000Z"
+      },
+      {
+        "id": 66241,
+        "pr_number": "B1200027667",
+        "item_code": "4",
+        "assigned_to_cl": 4,
+        "assigned_to_cs": 72,
+        "send_email_to": 72,
+        "item_complete": "1",
+        "is_updated": 1,
+        "is_delete": 0,
+        "pr_material_group_number": "8000",
+        "created_at": "2026-05-12T07:16:12.000Z",
+        "updated_at": "2026-05-12T07:16:12.000Z"
+      },
+      {
+        "id": 66242,
+        "pr_number": "B1200027667",
+        "item_code": "5",
+        "assigned_to_cl": 4,
+        "assigned_to_cs": 72,
+        "send_email_to": 72,
+        "item_complete": "1",
+        "is_updated": 1,
+        "is_delete": 0,
+        "pr_material_group_number": "8000",
+        "created_at": "2026-05-12T07:16:13.000Z",
+        "updated_at": "2026-05-12T07:16:13.000Z"
+      },
+      {
+        "id": 66243,
+        "pr_number": "B1200027667",
+        "item_code": "6",
+        "assigned_to_cl": 4,
+        "assigned_to_cs": 72,
+        "send_email_to": 72,
+        "item_complete": "1",
+        "is_updated": 1,
+        "is_delete": 0,
+        "pr_material_group_number": "8000",
+        "created_at": "2026-05-12T07:16:14.000Z",
+        "updated_at": "2026-05-12T07:16:14.000Z"
+      },
+      {
+        "id": 66244,
+        "pr_number": "B1200027667",
+        "item_code": "7",
+        "assigned_to_cl": 4,
+        "assigned_to_cs": 72,
+        "send_email_to": 72,
+        "item_complete": "6",
+        "is_updated": 1,
+        "is_delete": 0,
+        "pr_material_group_number": "8000",
+        "created_at": "2026-07-01T23:15:05.000Z",
+        "updated_at": "2026-07-01T23:15:05.000Z"
+      },
+      {
+        "id": 66245,
+        "pr_number": "B1200027667",
+        "item_code": "8",
+        "assigned_to_cl": 65,
+        "assigned_to_cs": null,
+        "send_email_to": 65,
+        "item_complete": "0",
+        "is_updated": 1,
+        "is_delete": 0,
+        "pr_material_group_number": "2800",
+        "created_at": "2026-07-31T02:18:19.000Z",
+        "updated_at": "2026-07-31T02:18:19.000Z"
+      }
+    ],
+    "exports": [
+      {
+        "id": 1100030121,
+        "pr_number": "B1200027667",
+        "board_id": 1,
+        "item_id": null,
+        "item_code": "9",
+        "category": "MRR",
+        "cl_board_id": 65,
+        "cl_user_id": 65,
+        "complete": "0",
+        "pr_status": "PR On Progress",
+        "latest_status": "SAP PO Published",
+        "assign_to_cl": null,
+        "assign_to_cs": null,
+        "is_updated": 0,
+        "is_delete": 0,
+        "created_at": null,
+        "updated_at": null
+      },
+      {
+        "id": 1100031021,
+        "pr_number": "B1200027667",
+        "board_id": 115702,
+        "item_id": 66238,
+        "item_code": "1",
+        "category": "GSL",
+        "cl_board_id": 4,
+        "cl_user_id": 4,
+        "complete": "1",
+        "pr_status": "PR Complete",
+        "latest_status": "SAP PO Published",
+        "assign_to_cl": "2026-05-12",
+        "assign_to_cs": "2026-05-12",
+        "is_updated": 0,
+        "is_delete": 0,
+        "created_at": "2026-05-12T05:43:55.000Z",
+        "updated_at": null
+      },
+      {
+        "id": 1100031022,
+        "pr_number": "B1200027667",
+        "board_id": 115702,
+        "item_id": 66239,
+        "item_code": "2",
+        "category": "GSL",
+        "cl_board_id": 4,
+        "cl_user_id": 4,
+        "complete": "6",
+        "pr_status": "PR Close",
+        "latest_status": "TOR Completed",
+        "assign_to_cl": "2026-05-12",
+        "assign_to_cs": "2026-05-12",
+        "is_updated": 0,
+        "is_delete": 0,
+        "created_at": "2026-05-12T05:43:55.000Z",
+        "updated_at": "2026-07-01T23:15:05.000Z"
+      },
+      {
+        "id": 1100031023,
+        "pr_number": "B1200027667",
+        "board_id": 115702,
+        "item_id": 66240,
+        "item_code": "3",
+        "category": "GSL",
+        "cl_board_id": 4,
+        "cl_user_id": 4,
+        "complete": "6",
+        "pr_status": "PR Close",
+        "latest_status": "TOR Completed",
+        "assign_to_cl": "2026-05-12",
+        "assign_to_cs": "2026-05-12",
+        "is_updated": 0,
+        "is_delete": 0,
+        "created_at": "2026-05-12T05:43:56.000Z",
+        "updated_at": "2026-07-01T23:15:05.000Z"
+      },
+      {
+        "id": 1100031024,
+        "pr_number": "B1200027667",
+        "board_id": 115702,
+        "item_id": 66241,
+        "item_code": "4",
+        "category": "GSL",
+        "cl_board_id": 4,
+        "cl_user_id": 4,
+        "complete": "1",
+        "pr_status": "PR Complete",
+        "latest_status": "SAP PO Published",
+        "assign_to_cl": "2026-05-12",
+        "assign_to_cs": "2026-05-12",
+        "is_updated": 0,
+        "is_delete": 0,
+        "created_at": "2026-05-12T05:43:56.000Z",
+        "updated_at": null
+      },
+      {
+        "id": 1100031025,
+        "pr_number": "B1200027667",
+        "board_id": 115702,
+        "item_id": 66242,
+        "item_code": "5",
+        "category": "GSL",
+        "cl_board_id": 4,
+        "cl_user_id": 4,
+        "complete": "1",
+        "pr_status": "PR Complete",
+        "latest_status": "SAP PO Published",
+        "assign_to_cl": "2026-05-12",
+        "assign_to_cs": "2026-05-12",
+        "is_updated": 0,
+        "is_delete": 0,
+        "created_at": "2026-05-12T05:43:57.000Z",
+        "updated_at": null
+      },
+      {
+        "id": 1100031026,
+        "pr_number": "B1200027667",
+        "board_id": 115702,
+        "item_id": 66243,
+        "item_code": "6",
+        "category": "GSL",
+        "cl_board_id": 4,
+        "cl_user_id": 4,
+        "complete": "1",
+        "pr_status": "PR Complete",
+        "latest_status": "SAP PO Published",
+        "assign_to_cl": "2026-05-12",
+        "assign_to_cs": "2026-05-12",
+        "is_updated": 0,
+        "is_delete": 0,
+        "created_at": "2026-05-12T05:43:58.000Z",
+        "updated_at": null
+      },
+      {
+        "id": 1100031027,
+        "pr_number": "B1200027667",
+        "board_id": 115702,
+        "item_id": 66244,
+        "item_code": "7",
+        "category": "GSL",
+        "cl_board_id": 4,
+        "cl_user_id": 4,
+        "complete": "6",
+        "pr_status": "PR Close",
+        "latest_status": "TOR Completed",
+        "assign_to_cl": "2026-05-12",
+        "assign_to_cs": "2026-05-12",
+        "is_updated": 0,
+        "is_delete": 0,
+        "created_at": "2026-05-12T05:43:58.000Z",
+        "updated_at": "2026-07-01T23:15:05.000Z"
+      },
+      {
+        "id": 1100031028,
+        "pr_number": "B1200027667",
+        "board_id": 123944,
+        "item_id": 66245,
+        "item_code": "8",
+        "category": "MRR",
+        "cl_board_id": 65,
+        "cl_user_id": 65,
+        "complete": "0",
+        "pr_status": "PR On Progress",
+        "latest_status": "NotAssign",
+        "assign_to_cl": "2026-07-31",
+        "assign_to_cs": null,
+        "is_updated": 1,
+        "is_delete": 0,
+        "created_at": null,
+        "updated_at": "2026-07-30T19:18:19.000Z"
+      }
+    ],
+    "counters": [
+      {
+        "id": 40721,
+        "card_id": 115703,
+        "pr_number": "B1200027667",
+        "item_id": 0,
+        "split_no": 1,
+        "split_for": "CL",
+        "created_at": "2026-05-12T01:00:34.000Z"
+      },
+      {
+        "id": 40753,
+        "card_id": 115760,
+        "pr_number": "B1200027667",
+        "item_id": 0,
+        "split_no": 2,
+        "split_for": "CL",
+        "created_at": "2026-05-12T05:43:55.000Z"
+      },
+      {
+        "id": 45421,
+        "card_id": 123944,
+        "pr_number": "B1200027667",
+        "item_id": 0,
+        "split_no": 3,
+        "split_for": "CL",
+        "created_at": "2026-07-31T02:18:19.000Z"
+      }
+    ],
+    "pr_logs": [
+      {
+        "id": 94564,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66238,
+        "pr_start_date": "2026-04-29T13:14:28.000Z",
+        "pr_end_date": "2026-05-04T17:00:00.000Z",
+        "assigned_to_cl": "2026-05-12T05:43:55.000Z",
+        "assigned_to_cs": "2026-05-12T05:43:55.000Z",
+        "created_at": "2026-04-29T13:14:28.000Z",
+        "updated_at": "2026-05-12T07:16:12.000Z"
+      },
+      {
+        "id": 95449,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66238,
+        "pr_start_date": "2026-04-29T08:26:14.000Z",
+        "pr_end_date": "2026-05-04T17:00:00.000Z",
+        "assigned_to_cl": "2026-05-12T01:00:34.000Z",
+        "assigned_to_cs": "2026-05-12T05:43:55.000Z",
+        "created_at": "2026-05-12T01:00:34.000Z",
+        "updated_at": "2026-05-12T07:16:12.000Z"
+      },
+      {
+        "id": 95450,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66239,
+        "pr_start_date": "2026-04-29T08:26:14.000Z",
+        "pr_end_date": null,
+        "assigned_to_cl": "2026-05-12T05:43:55.000Z",
+        "assigned_to_cs": "2026-05-12T05:43:55.000Z",
+        "created_at": "2026-05-12T01:00:34.000Z",
+        "updated_at": "2026-05-12T05:43:55.000Z"
+      },
+      {
+        "id": 95451,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66240,
+        "pr_start_date": "2026-04-29T08:26:14.000Z",
+        "pr_end_date": null,
+        "assigned_to_cl": "2026-05-12T05:43:56.000Z",
+        "assigned_to_cs": "2026-05-12T05:43:56.000Z",
+        "created_at": "2026-05-12T01:00:34.000Z",
+        "updated_at": "2026-05-12T05:43:56.000Z"
+      },
+      {
+        "id": 95452,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66241,
+        "pr_start_date": "2026-04-29T08:26:14.000Z",
+        "pr_end_date": "2026-05-04T17:00:00.000Z",
+        "assigned_to_cl": "2026-05-12T05:43:56.000Z",
+        "assigned_to_cs": "2026-05-12T05:43:56.000Z",
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T07:16:12.000Z"
+      },
+      {
+        "id": 95453,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66242,
+        "pr_start_date": "2026-04-29T08:26:14.000Z",
+        "pr_end_date": "2026-05-04T17:00:00.000Z",
+        "assigned_to_cl": "2026-05-12T05:43:57.000Z",
+        "assigned_to_cs": "2026-05-12T05:43:57.000Z",
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T07:16:13.000Z"
+      },
+      {
+        "id": 95454,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66243,
+        "pr_start_date": "2026-04-29T08:26:14.000Z",
+        "pr_end_date": "2026-05-04T17:00:00.000Z",
+        "assigned_to_cl": "2026-05-12T05:43:58.000Z",
+        "assigned_to_cs": "2026-05-12T05:43:58.000Z",
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T07:16:14.000Z"
+      },
+      {
+        "id": 95455,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66244,
+        "pr_start_date": "2026-04-29T08:26:14.000Z",
+        "pr_end_date": null,
+        "assigned_to_cl": "2026-05-12T05:43:58.000Z",
+        "assigned_to_cs": "2026-05-12T05:43:58.000Z",
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T05:43:58.000Z"
+      },
+      {
+        "id": 95456,
+        "pr_number": "B1200027667",
+        "server": "BCG",
+        "item_id": 66245,
+        "pr_start_date": "2026-04-29T08:26:14.000Z",
+        "pr_end_date": null,
+        "assigned_to_cl": "2026-07-31T02:18:19.000Z",
+        "assigned_to_cs": null,
+        "created_at": "2026-05-12T01:00:36.000Z",
+        "updated_at": "2026-07-31T02:18:19.000Z"
+      }
+    ],
+    "assignment_history": [
+      {
+        "id": 92782,
+        "pr_number": "B1200027667",
+        "item_id": 66238,
+        "item_code": "1",
+        "level_category": "CL",
+        "category": "GSL",
+        "activity": "Auto Assign",
+        "assign_start": "2026-05-12T01:00:34.000Z",
+        "assign_end": "2026-05-12T01:00:34.000Z",
+        "created_at": "2026-05-12T01:00:34.000Z",
+        "updated_at": "2026-05-12T01:00:34.000Z"
+      },
+      {
+        "id": 92858,
+        "pr_number": "B1200027667",
+        "item_id": 66238,
+        "item_code": "1",
+        "level_category": "CS",
+        "category": "GSL",
+        "activity": "Assign",
+        "assign_start": "2026-05-12T05:43:55.000Z",
+        "assign_end": "2026-05-12T07:16:12.000Z",
+        "created_at": "2026-05-12T05:43:55.000Z",
+        "updated_at": "2026-05-12T05:43:55.000Z"
+      },
+      {
+        "id": 93103,
+        "pr_number": "B1200027667",
+        "item_id": 66238,
+        "item_code": "1",
+        "level_category": "CS",
+        "category": "NC",
+        "activity": "PR Completed",
+        "assign_start": "2026-05-12T07:16:12.000Z",
+        "assign_end": null,
+        "created_at": "2026-05-12T07:16:12.000Z",
+        "updated_at": "2026-05-12T07:16:12.000Z"
+      },
+      {
+        "id": 92783,
+        "pr_number": "B1200027667",
+        "item_id": 66239,
+        "item_code": "2",
+        "level_category": "CL",
+        "category": "GSL",
+        "activity": "Auto Assign",
+        "assign_start": "2026-05-12T01:00:34.000Z",
+        "assign_end": "2026-05-12T01:00:34.000Z",
+        "created_at": "2026-05-12T01:00:34.000Z",
+        "updated_at": "2026-05-12T01:00:34.000Z"
+      },
+      {
+        "id": 92859,
+        "pr_number": "B1200027667",
+        "item_id": 66239,
+        "item_code": "2",
+        "level_category": "CS",
+        "category": "GSL",
+        "activity": "Assign",
+        "assign_start": "2026-05-12T05:43:56.000Z",
+        "assign_end": null,
+        "created_at": "2026-05-12T05:43:56.000Z",
+        "updated_at": "2026-05-12T05:43:56.000Z"
+      },
+      {
+        "id": 92784,
+        "pr_number": "B1200027667",
+        "item_id": 66240,
+        "item_code": "3",
+        "level_category": "CL",
+        "category": "GSL",
+        "activity": "Auto Assign",
+        "assign_start": "2026-05-12T01:00:34.000Z",
+        "assign_end": "2026-05-12T01:00:34.000Z",
+        "created_at": "2026-05-12T01:00:34.000Z",
+        "updated_at": "2026-05-12T01:00:34.000Z"
+      },
+      {
+        "id": 92860,
+        "pr_number": "B1200027667",
+        "item_id": 66240,
+        "item_code": "3",
+        "level_category": "CS",
+        "category": "GSL",
+        "activity": "Assign",
+        "assign_start": "2026-05-12T05:43:56.000Z",
+        "assign_end": null,
+        "created_at": "2026-05-12T05:43:56.000Z",
+        "updated_at": "2026-05-12T05:43:56.000Z"
+      },
+      {
+        "id": 92785,
+        "pr_number": "B1200027667",
+        "item_id": 66241,
+        "item_code": "4",
+        "level_category": "CL",
+        "category": "GSL",
+        "activity": "Auto Assign",
+        "assign_start": "2026-05-12T01:00:35.000Z",
+        "assign_end": "2026-05-12T01:00:35.000Z",
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T01:00:35.000Z"
+      },
+      {
+        "id": 92861,
+        "pr_number": "B1200027667",
+        "item_id": 66241,
+        "item_code": "4",
+        "level_category": "CS",
+        "category": "GSL",
+        "activity": "Assign",
+        "assign_start": "2026-05-12T05:43:57.000Z",
+        "assign_end": "2026-05-12T07:16:13.000Z",
+        "created_at": "2026-05-12T05:43:57.000Z",
+        "updated_at": "2026-05-12T05:43:57.000Z"
+      },
+      {
+        "id": 93104,
+        "pr_number": "B1200027667",
+        "item_id": 66241,
+        "item_code": "4",
+        "level_category": "CS",
+        "category": "NC",
+        "activity": "PR Completed",
+        "assign_start": "2026-05-12T07:16:13.000Z",
+        "assign_end": null,
+        "created_at": "2026-05-12T07:16:13.000Z",
+        "updated_at": "2026-05-12T07:16:13.000Z"
+      },
+      {
+        "id": 92786,
+        "pr_number": "B1200027667",
+        "item_id": 66242,
+        "item_code": "5",
+        "level_category": "CL",
+        "category": "GSL",
+        "activity": "Auto Assign",
+        "assign_start": "2026-05-12T01:00:35.000Z",
+        "assign_end": "2026-05-12T01:00:35.000Z",
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T01:00:35.000Z"
+      },
+      {
+        "id": 92862,
+        "pr_number": "B1200027667",
+        "item_id": 66242,
+        "item_code": "5",
+        "level_category": "CS",
+        "category": "GSL",
+        "activity": "Assign",
+        "assign_start": "2026-05-12T05:43:57.000Z",
+        "assign_end": "2026-05-12T07:16:13.000Z",
+        "created_at": "2026-05-12T05:43:57.000Z",
+        "updated_at": "2026-05-12T05:43:57.000Z"
+      },
+      {
+        "id": 93105,
+        "pr_number": "B1200027667",
+        "item_id": 66242,
+        "item_code": "5",
+        "level_category": "CS",
+        "category": "NC",
+        "activity": "PR Completed",
+        "assign_start": "2026-05-12T07:16:14.000Z",
+        "assign_end": null,
+        "created_at": "2026-05-12T07:16:14.000Z",
+        "updated_at": "2026-05-12T07:16:14.000Z"
+      },
+      {
+        "id": 92787,
+        "pr_number": "B1200027667",
+        "item_id": 66243,
+        "item_code": "6",
+        "level_category": "CL",
+        "category": "GSL",
+        "activity": "Auto Assign",
+        "assign_start": "2026-05-12T01:00:35.000Z",
+        "assign_end": "2026-05-12T01:00:35.000Z",
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T01:00:35.000Z"
+      },
+      {
+        "id": 92863,
+        "pr_number": "B1200027667",
+        "item_id": 66243,
+        "item_code": "6",
+        "level_category": "CS",
+        "category": "GSL",
+        "activity": "Assign",
+        "assign_start": "2026-05-12T05:43:58.000Z",
+        "assign_end": "2026-05-12T07:16:14.000Z",
+        "created_at": "2026-05-12T05:43:58.000Z",
+        "updated_at": "2026-05-12T05:43:58.000Z"
+      },
+      {
+        "id": 93106,
+        "pr_number": "B1200027667",
+        "item_id": 66243,
+        "item_code": "6",
+        "level_category": "CS",
+        "category": "NC",
+        "activity": "PR Completed",
+        "assign_start": "2026-05-12T07:16:14.000Z",
+        "assign_end": null,
+        "created_at": "2026-05-12T07:16:14.000Z",
+        "updated_at": "2026-05-12T07:16:14.000Z"
+      },
+      {
+        "id": 92788,
+        "pr_number": "B1200027667",
+        "item_id": 66244,
+        "item_code": "7",
+        "level_category": "CL",
+        "category": "GSL",
+        "activity": "Auto Assign",
+        "assign_start": "2026-05-12T01:00:35.000Z",
+        "assign_end": "2026-05-12T01:00:35.000Z",
+        "created_at": "2026-05-12T01:00:35.000Z",
+        "updated_at": "2026-05-12T01:00:35.000Z"
+      },
+      {
+        "id": 92864,
+        "pr_number": "B1200027667",
+        "item_id": 66244,
+        "item_code": "7",
+        "level_category": "CS",
+        "category": "GSL",
+        "activity": "Assign",
+        "assign_start": "2026-05-12T05:43:58.000Z",
+        "assign_end": null,
+        "created_at": "2026-05-12T05:43:58.000Z",
+        "updated_at": "2026-05-12T05:43:58.000Z"
+      },
+      {
+        "id": 92789,
+        "pr_number": "B1200027667",
+        "item_id": 66245,
+        "item_code": "8",
+        "level_category": "Admin",
+        "category": "Admin",
+        "activity": "New Item",
+        "assign_start": "2026-05-12T01:00:36.000Z",
+        "assign_end": "2026-05-12T01:00:36.000Z",
+        "created_at": "2026-05-12T01:00:36.000Z",
+        "updated_at": "2026-05-12T01:00:36.000Z"
+      },
+      {
+        "id": 109698,
+        "pr_number": "B1200027667",
+        "item_id": 66245,
+        "item_code": "8",
+        "level_category": "CL",
+        "category": "MRR",
+        "activity": "Auto Assign",
+        "assign_start": "2026-07-31T02:18:20.000Z",
+        "assign_end": "2026-07-31T02:18:20.000Z",
+        "created_at": "2026-07-31T02:18:20.000Z",
+        "updated_at": "2026-07-31T02:18:20.000Z"
+      }
+    ],
+    "cs_reports": [
+      {
+        "id": 61884,
+        "pr_number": "B1200027667",
+        "item_id": 66238,
+        "sourcing_method": 0,
+        "status_on": "SAP PO Published",
+        "created_at": "2026-05-12T05:43:55.000Z",
+        "updated_at": "2026-05-12T07:16:12.000Z"
+      },
+      {
+        "id": 61885,
+        "pr_number": "B1200027667",
+        "item_id": 66239,
+        "sourcing_method": 0,
+        "status_on": "TOR Completed",
+        "created_at": "2026-05-12T05:43:55.000Z",
+        "updated_at": "2026-05-25T08:02:24.000Z"
+      },
+      {
+        "id": 61886,
+        "pr_number": "B1200027667",
+        "item_id": 66240,
+        "sourcing_method": 0,
+        "status_on": "TOR Completed",
+        "created_at": "2026-05-12T05:43:56.000Z",
+        "updated_at": "2026-05-25T08:02:24.000Z"
+      },
+      {
+        "id": 61887,
+        "pr_number": "B1200027667",
+        "item_id": 66241,
+        "sourcing_method": 0,
+        "status_on": "SAP PO Published",
+        "created_at": "2026-05-12T05:43:56.000Z",
+        "updated_at": "2026-05-12T07:16:13.000Z"
+      },
+      {
+        "id": 61888,
+        "pr_number": "B1200027667",
+        "item_id": 66242,
+        "sourcing_method": 0,
+        "status_on": "SAP PO Published",
+        "created_at": "2026-05-12T05:43:57.000Z",
+        "updated_at": "2026-05-12T07:16:13.000Z"
+      },
+      {
+        "id": 61889,
+        "pr_number": "B1200027667",
+        "item_id": 66243,
+        "sourcing_method": 0,
+        "status_on": "SAP PO Published",
+        "created_at": "2026-05-12T05:43:58.000Z",
+        "updated_at": "2026-05-12T07:16:14.000Z"
+      },
+      {
+        "id": 61890,
+        "pr_number": "B1200027667",
+        "item_id": 66244,
+        "sourcing_method": 0,
+        "status_on": "TOR Completed",
+        "created_at": "2026-05-12T05:43:58.000Z",
+        "updated_at": "2026-05-25T08:02:24.000Z"
+      }
+    ]
+  },
+  "local_repair_execution": {
+    "success": true,
+    "status": "repaired",
+    "card_title": "B1200027667",
+    "item_card_ids": [
+      66245
+    ],
+    "repaired_items": 1,
+    "already_consistent_items": 0,
+    "created_cards": 2
+  },
+  "comparison": {
+    "before_operation_id": "5758f643-dd50-4e2f-a743-6fd1e1acc252",
+    "after_operation_id": "3e191f03-b879-4bbc-b0fe-a2e156a76e98",
+    "before_fingerprint": "29be015cc5179a90362f321b2abf9d9c87c5844e450b67c8a35748a7cc1dd891",
+    "after_fingerprint": "b7c1d46d85ab97b1645262fbe4bdfcad88a162a5c8ec08503f6700070dd40a3d",
+    "evidence_changed": true,
+    "changes": {
+      "board_cards": {
+        "added_ids": [
+          "123943",
+          "123944"
+        ],
+        "removed_ids": [],
+        "updated_ids": []
+      },
+      "item_cards": {
+        "added_ids": [],
+        "removed_ids": [],
+        "updated_ids": [
+          "66245"
+        ]
+      },
+      "exports": {
+        "added_ids": [],
+        "removed_ids": [],
+        "updated_ids": [
+          "1100031028"
+        ]
+      },
+      "counters": {
+        "added_ids": [
+          "45421"
+        ],
+        "removed_ids": [],
+        "updated_ids": []
+      },
+      "pr_logs": {
+        "added_ids": [],
+        "removed_ids": [],
+        "updated_ids": [
+          "95456"
+        ]
+      },
+      "assignment_history": {
+        "added_ids": [
+          "109698"
+        ],
+        "removed_ids": [],
+        "updated_ids": []
+      },
+      "cs_reports": {
+        "added_ids": [],
+        "removed_ids": [],
+        "updated_ids": []
+      }
+    }
+  }
+}

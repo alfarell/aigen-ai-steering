@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_00004_create_table_role_and_permission_down_sql", "label": "00004-create-table-role-and-permission.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/00004-create-table-role-and-permission.down.sql", "source_location": null}], "edges": []}

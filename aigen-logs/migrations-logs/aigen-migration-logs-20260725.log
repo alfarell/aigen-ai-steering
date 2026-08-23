@@ -1,0 +1,132 @@
+Executing (default): SELECT 1+1 AS result
+Executing (default): SELECT 1+1 AS result
+Executing (default): SELECT 1+1 AS result
+Executing (default): CREATE TABLE IF NOT EXISTS schema_migrations_aigen (
+      version VARCHAR(20) PRIMARY KEY,
+      applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+[DATABASE ISOURCING] Connection has been established successfully.
+[DATABASE] Connection has been established successfully.
+[DATABASE ISEARCH] Connection has been established successfully.
+Executing (default): SELECT version FROM schema_migrations_aigen
+[
+  { version: '00001' },
+  { version: '00002' },
+  { version: '00003' },
+  { version: '00004' },
+  { version: '00005' },
+  { version: '20260123103947' },
+  { version: '20260123120000' },
+  { version: '20260127180947' },
+  { version: '20260128104725' },
+  { version: '20260128105442' },
+  { version: '20260128171801' },
+  { version: '20260130171148' },
+  { version: '20260130172129' },
+  { version: '20260130180258' },
+  { version: '20260207182005' },
+  { version: '20260208095827' },
+  { version: '20260209214048' },
+  { version: '20260210214200' },
+  { version: '20260219135612' },
+  { version: '20260220134357' },
+  { version: '20260220173411' },
+  { version: '20260223154923' },
+  { version: '20260224094207' },
+  { version: '20260302083502' },
+  { version: '20260303100000' },
+  { version: '20260303100100' },
+  { version: '20260304000000' },
+  { version: '20260306145643' },
+  { version: '20260309104043' },
+  { version: '20260309110000' },
+  { version: '20260310083639' },
+  { version: '20260310092353' },
+  { version: '20260310104812' },
+  { version: '20260311095404' },
+  { version: '20260317134235' },
+  { version: '20260317152018' },
+  { version: '20260317153725' },
+  { version: '20260317161158' },
+  { version: '20260318170934' },
+  { version: '20260325101011' },
+  { version: '20260327082754' },
+  { version: '20260328104500' },
+  { version: '20260329093291' },
+  { version: '20260331083609' },
+  { version: '20260401083000' },
+  { version: '20260401190355' },
+  { version: '20260402090001' },
+  { version: '20260402120542' },
+  { version: '20260402120543' },
+  { version: '20260402143618' },
+  { version: '20260404121289' },
+  { version: '20260410123422' },
+  { version: '20260414090703' },
+  { version: '20260415123422' },
+  { version: '20260422101629' },
+  { version: '20260504143356' },
+  { version: '20260505034700' },
+  { version: '20260507092225' },
+  { version: '20260517174522' }
+]
+[aigen] ⬆️  20260512142400-add-category-matrix-sub-users.up.sql
+Executing (571eb3cf-2781-4d42-b3db-2299f3ad19fd): START TRANSACTION;
+Executing (571eb3cf-2781-4d42-b3db-2299f3ad19fd): CREATE TABLE IF NOT EXISTS category_matrix_sub_users (
+  id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  category_matrix_id INT UNSIGNED NOT NULL,
+  user_id INT UNSIGNED NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_category_matrix_sub_users_matrix_id FOREIGN KEY (category_matrix_id) REFERENCES category_matrices(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_category_matrix_sub_users_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+  CONSTRAINT uniq_category_matrix_sub_users_pair UNIQUE (category_matrix_id, user_id)
+)
+Executing (571eb3cf-2781-4d42-b3db-2299f3ad19fd): INSERT IGNORE INTO category_matrix_sub_users (category_matrix_id, user_id, created_at, updated_at)
+SELECT id, sub_category_user_id, NOW(), NOW()
+FROM category_matrices
+WHERE sub_category_user_id IS NOT NULL
+  AND deleted_at IS NULL
+Executing (571eb3cf-2781-4d42-b3db-2299f3ad19fd): ALTER TABLE category_matrices MODIFY COLUMN sub_category_user_id INTEGER UNSIGNED NULL
+Executing (571eb3cf-2781-4d42-b3db-2299f3ad19fd): INSERT INTO schema_migrations_aigen(version) VALUES ('20260512142400')
+Executing (571eb3cf-2781-4d42-b3db-2299f3ad19fd): COMMIT;
+[aigen] ⬆️  20260513090000-add-sub-category-id-to-rfq-library.up.sql
+Executing (3df05b3c-1273-451a-b939-f4fff9dc7b47): START TRANSACTION;
+Executing (3df05b3c-1273-451a-b939-f4fff9dc7b47): ALTER TABLE `rfq_library`
+  ADD COLUMN `sub_category_id` INT UNSIGNED NULL DEFAULT NULL AFTER `sub_category`
+Executing (3df05b3c-1273-451a-b939-f4fff9dc7b47): UPDATE `rfq_library` r
+  INNER JOIN `categories` c
+    ON c.`name` = r.`sub_category`
+   AND c.`parent_name` = r.`category`
+   AND c.`level` = 1
+SET r.`sub_category_id` = c.`id`
+WHERE r.`sub_category_id` IS NULL
+  AND r.`sub_category` IS NOT NULL
+  AND r.`category` IS NOT NULL
+Executing (3df05b3c-1273-451a-b939-f4fff9dc7b47): INSERT INTO schema_migrations_aigen(version) VALUES ('20260513090000')
+Executing (3df05b3c-1273-451a-b939-f4fff9dc7b47): COMMIT;
+[aigen] ⬆️  20260722100000-add-sub-category-id-to-qcf-library.up.sql
+Executing (671fa99c-21b8-4356-a515-cbd78f95d5b3): START TRANSACTION;
+Executing (671fa99c-21b8-4356-a515-cbd78f95d5b3): ALTER TABLE qcf_library
+  ADD COLUMN sub_category_id INT UNSIGNED NULL DEFAULT NULL AFTER sub_category
+Executing (671fa99c-21b8-4356-a515-cbd78f95d5b3): ALTER TABLE qcf_library
+  ADD INDEX idx_qcf_library_sub_category_id (sub_category_id)
+Executing (671fa99c-21b8-4356-a515-cbd78f95d5b3): UPDATE qcf_library q
+INNER JOIN rfq_library r ON r.id = q.rfq_item_id
+SET q.sub_category_id = r.sub_category_id
+WHERE q.sub_category_id IS NULL
+  AND r.sub_category_id IS NOT NULL
+Executing (671fa99c-21b8-4356-a515-cbd78f95d5b3): UPDATE qcf_library q
+LEFT JOIN categories c ON c.id = q.sub_category_id
+SET q.sub_category_id = NULL
+WHERE q.sub_category_id IS NOT NULL
+  AND c.id IS NULL
+Executing (671fa99c-21b8-4356-a515-cbd78f95d5b3): ALTER TABLE qcf_library
+  ADD CONSTRAINT fk_qcf_library_sub_category_id
+  FOREIGN KEY (sub_category_id) REFERENCES categories(id)
+  ON DELETE SET NULL ON UPDATE CASCADE
+Executing (671fa99c-21b8-4356-a515-cbd78f95d5b3): INSERT INTO schema_migrations_aigen(version) VALUES ('20260722100000')
+Executing (671fa99c-21b8-4356-a515-cbd78f95d5b3): COMMIT;
+[aigen] ✅ Done

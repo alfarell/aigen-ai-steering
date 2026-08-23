@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_prpo_20260122092136_create_sap_storage_location_table_down_sql", "label": "20260122092136-create-sap-storage-location-table.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/prpo/20260122092136-create-sap-storage-location-table.down.sql", "source_location": null}], "edges": []}

@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_20260415123422_create_view_latest_rfq_state_up_sql", "label": "20260415123422-create-view-latest-rfq-state.up.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/20260415123422-create-view-latest-rfq-state.up.sql", "source_location": null}], "edges": []}

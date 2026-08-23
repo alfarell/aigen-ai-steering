@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_20260223154923_create_table_log_acl_down_sql", "label": "20260223154923-create-table-log-acl.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/20260223154923-create-table-log-acl.down.sql", "source_location": null}], "edges": []}

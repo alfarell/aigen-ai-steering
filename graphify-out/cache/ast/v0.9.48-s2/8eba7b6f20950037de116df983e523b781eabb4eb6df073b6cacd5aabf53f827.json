@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_20260325101011_create_dashboard_views_down_sql", "label": "20260325101011-create-dashboard-views.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/20260325101011-create-dashboard-views.down.sql", "source_location": null}], "edges": []}

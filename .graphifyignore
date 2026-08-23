@@ -1,0 +1,10 @@
+# graphify corpus scope: ONLY the four application repositories.
+# Everything else at the workspace root is out of scope.
+#
+# /* excludes every root entry; the negations below re-include the four repos.
+# These also override the root .gitignore, which excludes all four from version
+# control — .graphifyignore is read after .gitignore, so last-match-wins.
+/*
+!/aigen-backend/
+!/aigen-frontend/
+!/aigen-import-pr/

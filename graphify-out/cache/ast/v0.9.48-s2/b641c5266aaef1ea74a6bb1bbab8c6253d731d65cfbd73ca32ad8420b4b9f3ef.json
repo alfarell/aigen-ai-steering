@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_20260402090001_create_table_category_matrices_down_sql", "label": "20260402090001-create-table-category-matrices.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/20260402090001-create-table-category-matrices.down.sql", "source_location": null}], "edges": []}
