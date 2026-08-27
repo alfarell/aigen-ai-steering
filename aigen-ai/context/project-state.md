@@ -20,13 +20,14 @@ Snapshot date: 2026-07-30.
 - **Verified:** Kafka and CLI PR import with configurable assignment strategy, RFQ creation, backend notification calls, and three-schema reads.
 - **Verified:** GEMS QCF manual-PO pilot logic is feature-flagged in backend and represented in frontend route/approval behavior.
 - **Verified:** Admin master data includes users, divisions, roles, categories, category matrices, material hierarchy, and material assignment.
+- **Verified (2026-08-23):** iSourcing transfer runs behind a driver layer. `ISOURCING_TRANSFER_DRIVER` selects `database` (default, current production behavior) or `api`. Both app and cron environments must carry the same value; each logs its active driver at boot. The `api` driver is a structurally complete skeleton whose payload and error mapping stay provisional until the iSourcing contract is published.
 
 ## Partially implemented or weakly verified
 
 - **Verified:** Frontend README contains an old numbered TODO list for screens that now have routes/services/components. Completion of every edge case is **Unknown**; the list should not be treated as current scope.
 - **Verified:** Frontend has no automated tests, so implemented role/token/UI journeys are weakly protected.
 - **Verified:** Import worker has no automated tests and its transaction helper is not used consistently by service queries.
-- **Verified:** Backend Jest is currently red: the 2026-07-29 bootstrap run passed 5/7 suites and 45/56 tests. DIC reminder tests have drifted and module loading opens database connections during unit tests.
+- **Verified:** Backend Jest is currently red: the 2026-08-23 run on `develop-dot` passed 21/23 suites and 187/198 tests. All 11 failures belong to the two pre-existing DIC reminder suites, unchanged from the run taken before the iSourcing driver work. Module loading still opens database connections during unit tests.
 - **Inferred:** OpenAPI is intended as the external API contract, but route/OpenAPI drift has not been fully diffed.
 - **Unknown:** Production deployment topology, Kafka retry/dead-letter policy, database backup/restore, release process, and operational ownership.
 

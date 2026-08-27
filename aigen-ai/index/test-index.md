@@ -1,7 +1,18 @@
 # Test index
 
+Note: the `manualSourcingInvocationService.test.js` and `manualSourcingTransferService.test.js`
+rows below describe the unadopted `feat/enhancement-on-cron` branch. Neither file exists on
+`develop-dot`.
+
 | Module/Feature | Test File | Level | Covered Behavior | Known Gaps |
 |---|---|---|---|---|
+| iSourcing transfer driver config | `aigen-backend/tests/config/isourcingDriverConfig.test.js` | Unit with mocked config | default/valid/unknown driver value, api credential completeness, boot guard messages | real Joi env validation at boot |
+| iSourcing transfer port | `aigen-backend/tests/services/isourcingTransferPort.test.js` | Unit with mocks | driver delegation, input validation, result-shape guard, structured log, Sentry tagging | real driver integration |
+| iSourcing API driver | `aigen-backend/tests/services/isourcingApiDriver.test.js` | Unit with mocked HTTP | payload shape, idempotency key, response mapping, partial-success failure, retry classification, credential redaction | real endpoint; payload/error mapping is provisional until the contract is published |
+| iSourcing driver parity | `aigen-backend/tests/services/isourcingDriverParity.test.js` | Unit with mocks | both drivers expose `transfer`, share success/failure shapes, and `pending` stays api-only | only the shapes are compared, not full behavior |
+| iSourcing reconciliation | `aigen-backend/tests/services/isourcingReconciliation.test.js` | Unit with mocks | queued/succeeded/failed handling, deferred Aigen work and rollback, stage-specific follow-up, driver-owned re-send, 404, stale escalation | real status endpoint; the deferred work is asserted through mocks, not a database |
+| iSourcing pending transfer (controller) | `aigen-backend/tests/controllers/qcfController.pendingTransfer.test.js` | Unit with mocks | `200` with `transfer_status: pending`, no Aigen mutation, no token closed, origin-stage forwarding | the HTTP route itself is not exercised |
+| iSourcing transfer request repository | `aigen-backend/tests/repository/isourcingTransferRequest.test.js` | Unit with mocked model | idempotency-key determinism and attempt versioning, queued/stale queries, status transitions | the migration has never been applied, so column types and the unique index are unverified |
 | Business-day subtraction | `aigen-backend/tests/helper/date.test.js` | Unit | weekday/weekend subtraction and inverse relation | holidays, timezone/DST, other date exports |
 | Calendar-day log helper | `aigen-backend/tests/helper/log.test.js` | Unit | same/reversed dates, weekends, month boundary | response/log/activity helpers |
 | GEMS QCF workflow policy | `aigen-backend/tests/helper/qcfWorkflowPolicy.test.js` | Unit | feature flag, CL/Management/manual-source roles and state | controller/repository integration |

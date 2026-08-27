@@ -8,6 +8,7 @@
 | Sistem tujuan | iSourcing baru (**isourcing-vanilla**) |
 | Dokumen terkait | `aigen-reports/20260822-210020-aigen-cron-auto-manual-sourcing-to-isourcing.md` |
 | Sifat dokumen | Kebutuhan dari sisi konsumen (Aigen). Bukan spesifikasi final; menjadi bahan diskusi dengan tim iSourcing. |
+| **Status (2026-08-24)** | **Terjawab.** iSourcing menerbitkan `isourcing-docs/public-api-contract-pr-transfer.md` v1.0. Kontrak itu yang mengikat, bukan dokumen ini. Beberapa kebutuhan di sini ditolak — terutama E-2, E-3, I-3 (upsert), respons sinkron, dan versioning path. Dokumen ini dipertahankan sebagai jejak permintaan awal. |
 
 ---
 

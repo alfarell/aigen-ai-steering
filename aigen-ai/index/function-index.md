@@ -6,6 +6,15 @@
 | `runCronTasks` | function | `aigen-backend/src/cron.js` | Select/run expiry and reminder stages | `cronJob`, manual cron controller | Unknown |
 | `cronJob` | function | `aigen-backend/src/cron.js` | Authenticate DB and run cron work | direct script, `server.js` | Unknown |
 | `cronSync` | function | `aigen-backend/src/sync.js` | Run SAP PO synchronization | direct script | Unknown |
+| `transferToISourcing` | function | `aigen-backend/src/services/isourcing/isourcingTransfer.port.js` | Only route into iSourcing; validate input, resolve driver, guard result, log | `sendActionToCS`, `handleNineDayRfqFollowUp` | `isourcingTransferPort.test.js` |
+| `resolveDriver` | function | `aigen-backend/src/services/isourcing/isourcingTransfer.port.js` | Select and lazily load the configured driver | `transferToISourcing` | `isourcingTransferPort.test.js` |
+| `transfer` (database driver) | function | `aigen-backend/src/services/isourcing/drivers/database.driver.js` | Write board/item/export/log rows in one iSourcing transaction | transfer port | `qcfController.manualSourcingHeader.test.js`, `isourcingDriverParity.test.js` |
+| `transfer` (api driver) | function | `aigen-backend/src/services/isourcing/drivers/api.driver.js` | Post header + items to the iSourcing public API with retry and idempotency key | transfer port | `isourcingApiDriver.test.js`, `isourcingDriverParity.test.js` |
+| `getIsourcingTransferDriver` | function | `aigen-backend/src/helper/featureFlag.js` | Single read point for the configured driver | transfer port | `isourcingDriverConfig.test.js` |
+| `assertIsourcingTransferConfig` | function | `aigen-backend/src/helper/featureFlag.js` | Boot guard for driver value and api credentials | `app.js`, `src/cron.js` | `isourcingDriverConfig.test.js` |
+| `isPending` | function | `aigen-backend/src/services/isourcing/isourcingTransfer.port.js` | Recognize the queued-but-not-written outcome | `qcfController.js` | `isourcingTransferPort.test.js` |
+| `reconcileIsourcingTransfers` | function | `aigen-backend/src/services/isourcing/isourcingReconciliation.service.js` | Poll queued transfers, finish the deferred Aigen work, re-send or escalate | `src/cron.js` `reconcile` stage | `isourcingReconciliation.test.js` |
+| `buildIdempotencyKey` | function | `aigen-backend/src/repository/isourcingTransferRequest.repository.js` | Deterministic key versioned by attempt | api driver, reconciliation | `isourcingTransferRequest.test.js` |
 | `usersLogin` | handler | `aigen-backend/src/controllers/authController.js` | Legacy/dashboard login adapter | `/auth/login` | Unknown |
 | `basicLogin` | handler | `aigen-backend/src/controllers/authController.js` | Basic-login adapter | `/auth/login/basic` | Unknown |
 | `authenticateToken` | middleware | `aigen-backend/src/services/authService.js` | Verify internal Bearer session | protected routes | Unknown |

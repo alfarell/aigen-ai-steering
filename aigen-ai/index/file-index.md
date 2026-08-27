@@ -8,6 +8,14 @@ This is intentionally selective. Generated files, assets, and trivial helpers ar
 | `aigen-backend/config.js` | Validate/map backend environment | Backend config | Joi, environment |
 | `aigen-backend/src/cron.js` | Run reminder and stage-expiry work | Backend jobs | Sequelize, PR/QCF services/controllers |
 | `aigen-backend/src/sync.js` | Run SAP PO sync | Backend jobs | primary DB, RFQ controller |
+| `aigen-backend/src/services/isourcing/isourcingTransfer.port.js` | Single route into iSourcing; resolve driver, guard result shape, log | Backend iSourcing transfer | feature flag helper, drivers, Sentry |
+| `aigen-backend/src/services/isourcing/drivers/database.driver.js` | Write task_board directly in one transaction (moved from `qcfController.js`) | Backend iSourcing transfer | iSourcing DB, QCF repository |
+| `aigen-backend/src/services/isourcing/drivers/api.driver.js` | Transfer through the iSourcing public API (contract stubbed) | Backend iSourcing transfer | iSourcing API client, QCF repository |
+| `aigen-backend/src/api/isourcing.api.js` | Axios client for the iSourcing public API, Basic Auth and redaction | Backend iSourcing transfer | axios, config |
+| `aigen-backend/src/const/isourcing-transfer.js` | Driver names, outcomes, canonical and contract error codes | Backend iSourcing transfer | none |
+| `aigen-backend/src/services/isourcing/isourcingReconciliation.service.js` | Poll queued transfers, finish deferred Aigen work, re-send or escalate | Backend iSourcing transfer | status client, transfer-request repository, QCF repository, token stores |
+| `aigen-backend/src/repository/isourcingTransferRequest.repository.js` | Persist and query submitted transfers; build idempotency keys | Backend iSourcing transfer | `isourcingTransferRequest` model |
+| `aigen-backend/src/models/default/isourcingTransferRequest.js` | Model for `isourcing_transfer_requests` | Backend iSourcing transfer | primary DB |
 | `aigen-backend/src/routes/purchaseRoutes.js` | Main PR/RFQ/QCF HTTP contract | Backend workflow | auth/token middleware, workflow controllers |
 | `aigen-backend/src/routes/authRoutes.js` | Login/OAuth/reset/profile contract | Backend identity | auth controller, authentication |
 | `aigen-backend/src/routes/masterDataRoutes.js` | Master-data HTTP contract | Backend admin | auth, permissions, validators/controllers |

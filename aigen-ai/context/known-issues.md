@@ -76,6 +76,65 @@
 - **Residual risk:** no production revision or real task-board workflow was
   exercised; deploying the patch does not repair historical sparse headers.
 
+### KI-014 - iSourcing driver modes are not data-identical
+
+- **Verified (2026-08-23):** the transfer now runs behind a driver layer selected
+  by `ISOURCING_TRANSFER_DRIVER`. The `database` driver writes `exports_data` and
+  resolves category/CL assignment locally. By decision, the `api` driver does
+  neither: assignment belongs to iSourcing, and `exports_data` does not exist in
+  isourcing-vanilla.
+- **Impact:** a PR transferred through the API has no `exports_data` row. Any
+  consumer of the legacy iSourcing dashboard must be confirmed before cutover.
+- **Impact:** rollback from `api` to `database` is safe for new PRs, but PRs
+  already transferred through the API are not retroactively completed.
+- **Verified:** no automated reconciliation tool exists on `develop-dot`.
+  `reconcile:isourcing` lives only on the unadopted `feat/enhancement-on-cron`
+  branch, so post-cutover verification needs an agreed read-only query set.
+- **Verified:** `api` mode still opens the iSourcing database connection, because
+  the shared `qcfLibrary.repository` module imports `database_isourcing` at load
+  time. Only writes stop; the connection does not.
+- **Verified (2026-08-24, contract v1.0):** the API path is **asynchronous**. `202` only means
+  queued; the terminal result arrives from a separate status endpoint. Aigen status mutation and
+  token deactivation therefore move to a reconciliation cron run, so a token stays active longer
+  in `api` mode than in `database` mode.
+- **Mitigated in code (2026-08-24):** a failed transfer no longer blocks its PR permanently. The
+  attempt is derived from stored state, the re-send budget is `ISOURCING_API_MAX_RESEND`, and a
+  spent budget marks the row `exhausted` so the driver stops calling the API and alerts once. The
+  RFQ token is deliberately left active for an exhausted transfer — closing it would discard
+  unfinished work — so `findExhausted` provides the operator backlog.
+- **Mitigated in code (2026-08-24):** `status_dic` is set on the API path again. Transfers carry
+  `origin_stage` and the reconciliation stage applies the stage-specific follow-up in the same
+  transaction.
+- **Verified (2026-08-24):** the API has **no upsert**. A PR that already exists cannot receive
+  later items (`501`); a new idempotency key over an existing PR returns
+  `409 PR_ALREADY_EXISTS`. The database driver's "existing PR, missing items added" branch has no
+  API equivalent, and those items are handled by a manual procedure that is not yet written.
+- **Verified (2026-08-24):** auto-assignment requires `material_group_code`,
+  `extended_material_group_code`, and `material_number_code` together on each item. Aigen carries
+  all three on `rfq_library` (`pr_material_group_number`, `external_material_group`,
+  `sap_material_number`) but each is nullable. A missing value is not an error: the PR is created
+  without a Category Leader and waits for manual assignment.
+- **Evidence:** `aigen-ai/specs/active/isourcing-transfer-driver/spec.md`
+  (OI-5, OI-6, OI-8, OI-9, OI-10),
+  `aigen-tasks/20260823-151149-feat-isourcing-transfer-driver/plan.md`, and
+  `isourcing/isourcing-docs/public-api-contract-pr-transfer.md` v1.0.
+
+### ~~KI-015~~ - Aigen migration chain was blocked on pre-existing duplicate data
+
+- **Resolved on local (2026-08-24).** The blocking duplicate data was handled by the team and
+  `npm run migrate -- up --db=aigen` completed.
+- **Verified read-only (2026-08-24):** `isourcing_transfer_requests` exists with 22 columns,
+  `business_key varchar(255)`, `origin_stage varchar(20)`,
+  `status enum('queued','succeeded','failed','exhausted')`, the unique index on
+  `idempotency_key`, and the `business_key` index — matching the current migration, including the
+  R-1 and R-2 schema changes.
+- **Residual risk:** verified on the local environment only. Other environments still carry the
+  original blockage until the same data decision is applied there.
+- **Residual risk:** the `.down.sql` rollback has never been executed; testing it would drop the
+  table.
+- **Evidence:** `aigen-tasks/20260824-031739-feat-isourcing-api-contract-v1/plan.md` and
+  `aigen-tasks/20260824-150702-fix-isourcing-transfer-recovery/plan.md`.
+
 ## Medium priority
 
 ### KI-004 — Frontend has no automated tests
