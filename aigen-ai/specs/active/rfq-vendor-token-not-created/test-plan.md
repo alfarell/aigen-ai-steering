@@ -84,7 +84,7 @@ Interpretation:
 
 | Observation | Indicated cause |
 |---|---|
-| No token row, `status_milestone = 1` | Dispatch never ran, or aborted before the status update — consistent with D-1 + D-2 on the expiry path |
+| No token row, `status_milestone = 1` | Dispatch never ran, or aborted before the status update. (Originally attributed to D-1 + D-2; the D-1 half is void — see the correction below.) |
 | No token row, `status_milestone = 2` | Dispatch ran and mutated status but died before the token write — confirms D-4, cause likely D-3 via missing SLA config |
 | Token row exists but `is_active = 0` or `date_expired` in the past | Not this bug; investigate revocation/expiry instead |
 | Multiple active token rows | Confirms D-5 is already producing duplicates in production (OI-5) |
@@ -131,7 +131,7 @@ HAVING COUNT(*) > 1;
 | Expiry escalation produces a working link | Non-production env; synthetic RFQ with 2 eligible items, vendor lvl1 + lvl2, active `WAITING_VENDOR_EXPIRY` config | Trigger the vendor-expiry path that calls `resendEmailVendors` with `item_codes` | Both vendors receive an email; one active token per vendor/batch; both links open the RFQ detail |
 | CS manual resend still works | Same env, synthetic RFQ | `POST /cs/resend_rfq/:rfq_number/:vendor_batch` as an authenticated CS user | Token updated in place, not duplicated; link opens the detail |
 | Missing SLA config is diagnosable | Same env; deactivate `WAITING_VENDOR_EXPIRY` for the test server group | Trigger dispatch | Typed error naming the config key in logs; RFQ **not** left at `RFQ_SENT_TO_VENDOR`; no email sent |
-| Email-burst check before deploy | Non-production env with production-like row counts | Count rows matched by the fixed `item_code` clause versus today | Volume is understood and acceptable; CS notified if large |
+| ~~Email-burst check before deploy~~ | **VOID 2026-09-02** | The `item_code` clause matched the same rows before and after the fix, so no backlog of undispatched RFQs exists and no burst is possible. This scenario is retired. |
 
 ## Security and failure cases
 
@@ -420,12 +420,21 @@ code was run. `RFQ0002052` itself was never modified; a synthetic copy `RFQTEST9
 **Symptom reproduced.** `RFQ0002052` has one `rfq_library` row (item `10`, vendor `106412`, batch 1,
 GEMS) at `status_milestone = 2`, `status_vendor = null`, and **zero** `rfq_token_email` rows.
 
-**D-1 is NOT the cause of this particular RFQ — correction to the original ranking.** Running the
-old and the fixed clause shapes through the real Sequelize model against this data returns **1 row
-each**. The RFQ has a single item, and MySQL flattens `IN (('10'))` to `IN ('10')`, so the nested
-array only breaks scopes with two or more item codes. Measured impact: **1,042 of 3,342**
-`(rfq_number, vendor_code, vendor_batch)` scopes are multi-item, so D-1 affects roughly 31% of
-scopes — real, but not this one.
+**~~D-1 is NOT the cause of this particular RFQ~~ — this correction was itself WRONG. Superseded
+2026-09-02.** It claimed the nested array was harmless only for single-item RFQs because MySQL
+flattens `IN (('10'))`, and estimated a 31% impact across 1,042 multi-item scopes. Both claims are
+false. **D-1 is not a defect at any cardinality.** Re-tested on scopes of 1, 2 and 3 item codes,
+the old and fixed clause shapes return the same rows, and capturing the generated SQL shows why —
+Sequelize normalises the nested array before the statement is built:
+
+```
+OLD (nested)  ... item_code IN ('10', '20', '30');
+NEW (flat)    ... item_code IN ('10', '20', '30');
+```
+
+The flattening is in Sequelize, not MySQL, and there is no cardinality at which the two differ.
+The estimated 31% impact is withdrawn entirely: the real impact is zero. See the correction banner
+in `design.md`.
 
 **The SLA-config hypothesis is also ruled out**: `Waiting_vendor_expiry = 3` exists and is active
 for GEMS.
@@ -487,3 +496,57 @@ Everything below is unverified at spec time and must be resolved or restated at 
   Accepted at current volume; not covered by any test.
 - No production log or Sentry evidence for `RFQ0002052` was available during investigation.
   The failure chain in `design.md` is derived from code reading, not from an observed stack trace.
+
+## Second implementation: the `production` branch (2026-09-02)
+
+The first implementation targeted `develop-dot`. It was ported to `production` as commit
+`c7a64994` and then removed by the owner, because the two codebases diverge materially and the
+port dragged in a `require('../const/isourcing-transfer')` for a file the revert `133a4fd6` had
+deleted on `production` — the app failed to boot with `MODULE_NOT_FOUND`.
+
+The fix was therefore re-implemented from scratch against `production`, on branch
+`fix/rfq-vendor-token-production` (from `production` @ `a978fdbb`). It is a separate
+implementation, not a cherry-pick.
+
+**What differs on `production`:**
+- `resendEmailVendors` carries the same D-2..D-5 defects at different lines (`emailServices.js:668`).
+  D-1 is present too but is **not a defect** — see the correction in `design.md`; the change made
+  for it on this branch is code hygiene only.
+- **13** wrapper functions discard `sendEmail`'s boolean, not 12 — no wrapper already returned it.
+- Seven of the routes that flow through `handleSendTemplateEmail` are commented out in
+  `emailRoutes.js`; six are live. That sizing is why the `failOnTransportFalse` default stays
+  `false` here.
+- `src/const/isourcing-transfer.js` does not exist on this branch and `prService.js` does not
+  require it, so the branch boots.
+
+**Scope delivered:** D-1 (hygiene only, no behavioural effect) and D-2..D-5; the boolean propagated out of all 13 wrappers; an opt-in
+`failOnTransportFalse` on `handleSendTemplateEmail` defaulting to `false`; status mutations gated
+on dispatch success in `sendRequestForQuotation`, `resendRFQVendor`, `resendRFQVendorSpesific` and
+`sendPrRevisedProceedToQcf`, all four opting in to the flag; `res.headersSent` guards; strict
+`false` handled in `resendFailedEmails`; the structured outcome consumed at the five non-`prService`
+call sites with the activity logs gated on a real send.
+
+**Deliberately NOT done here:** the `failOnTransportFalse` default is NOT flipped, so the other
+non-gated routes keep their existing HTTP contract.
+
+**Behaviour change to note before release:** the four gated routes now respond 500 (and write a
+`FailedEmail` row) when the transport reports failure, where they previously returned 200. Three of
+them — `resendRFQVendor`, `resendRFQVendorSpesific`, `sendPrRevisedProceedToQcf` — are live routes.
+
+**Two defects caught in review and fixed:**
+1. The gate was initially a no-op at three of the four sites: `sendEmail` never throws, so without
+   the opt-in flag `ok` was always `true` on a silent SMTP failure. All four now opt in.
+2. Making `resendEmailVendors` non-throwing introduced a regression in `prService.js`: the skip and
+   failure paths used to throw and abort before the logging block, so `addLogQuotationByDataItems`
+   now ran unconditionally and wrote false "RFQ Launched - Email Sent" entries. Those two calls are
+   now gated on a `sent` or `unknown` classification. This is the only change made to
+   `prService.js`; its abort-on-throw loop behaviour is unchanged.
+
+Three failure tests were also rewritten: they simulated `mockRejectedValue`, a path production
+cannot take, and now use `mockResolvedValue(false)` — the real failure mode — with the thrown-error
+case kept alongside.
+
+**Validation on this branch:** baseline before the change was 148 passed / 20 failed / 168 total.
+After: **199 passed, 20 failed, 219 total** — the same 20 pre-existing failures in
+`tests/repository/rfqLibrary.dicReminder.test.js` and `tests/controllers/qcfController.dicReminder.test.js`.
+51 tests added across 11 new files. `git diff --check` clean.

@@ -42,23 +42,54 @@ It signs its own JWT (`:796`) and calls `rfqTokenEmail.create()` (`:802`) uncond
 
 ### Confirmed defects in path B
 
+> ## ⚠ CORRECTION (2026-09-02): D-1 IS NOT A DEFECT
+>
+> D-1 was the anchor of the original root-cause analysis. It is **wrong**, and everything in this
+> document that depends on it is void.
+>
+> Sequelize normalises a nested array passed to `Op.in`. Both clause shapes emit **identical SQL**,
+> verified by capturing the generated statement against a production copy:
+>
+> ```
+> OLD (nested)  ... item_code IN ('10', '20', '30');
+> NEW (flat)    ... item_code IN ('10', '20', '30');
+> ```
+>
+> Checked on scopes of 1, 2 and 3 item codes — the row counts match in every case. The nested array
+> never suppressed a single row, so it never emptied `getdata`, never triggered D-2, and never
+> aborted the vendor loop.
+>
+> An earlier partial correction in `test-plan.md` claimed D-1 was harmless only for single-item
+> RFQs because MySQL flattens `IN (('10'))`. **That was also wrong** — the flattening happens in
+> Sequelize, before SQL is generated, and applies at any cardinality.
+>
+> Changing the clause to `{ [Op.in]: item_codes }` remains correct as code hygiene, but it fixes
+> no behaviour. **The root cause of the reported issue is still unexplained** — see the RG-6 and
+> "Local replication" sections of `test-plan.md`. D-2..D-5 below are unaffected by this correction
+> and remain real; D-4 and D-5 are the two with measured production impact.
+
 | ID | Line | Defect |
 |---|---|---|
-| D-1 | `emailServices.js:735` | `clause.item_code = { [Op.in]: [item_codes] }` wraps the array in another array. With `item_codes = ['A','B']` this queries `IN (('A','B'))` and matches nothing. `prService.js:171` is the only caller that passes `item_codes` — so the entire vendor-expiry escalation path selects zero rows. |
-| D-2 | `emailServices.js:759-761` | `const firstItem = getdata[0]` with no empty guard, immediately destructured at `:761`. When D-1 empties the set, this throws `TypeError: Cannot destructure property 'cs_id' of 'undefined'`. Path A has this guard (`emailController.js:437`); path B does not. |
+| ~~D-1~~ | ~~`emailServices.js:735`~~ | **VOID — not a defect.** See the correction above. `{ [Op.in]: [item_codes] }` is normalised by Sequelize to the same SQL as the flat form. |
+| D-2 | `emailServices.js:759-761` | `const firstItem = getdata[0]` with no empty guard, immediately destructured at `:761`. Throws `TypeError: Cannot destructure property 'cs_id' of 'undefined'` whenever the eligibility filter genuinely matches nothing — e.g. every item for that vendor already submitted. (The original text attributed the empty set to D-1; that attribution is void, but the missing guard is real and reachable on its own.) Path A has this guard (`emailController.js:437`); path B does not. |
 | D-3 | `emailServices.js:709`, `:774` | `sendResponse(res, ...)` references `res`, which is **not a parameter** — the signature is `(request)` (`:704`). Both guard branches throw `ReferenceError: res is not defined` instead of returning. This masks the real cause (missing `rfq_number`, missing SLA config) behind a misleading error. |
 | D-4 | `emailServices.js:743-757` vs `:802` | Status is mutated to `RFQ_SENT_TO_VENDOR` **before** the token is created, with no transaction. Anything throwing in between (D-2, D-3, SLA lookup, JWT) leaves the RFQ marked "sent to vendor" with no token and no email — the exact reported symptom. Path A has the same ordering hazard (`emailController.js:447` before `:570`). |
 | D-5 | `emailServices.js:802` | `rfqTokenEmail.create()` is unconditional. Repeated dispatch accumulates multiple active rows for one `(rfq_number, vendor_batch, vendor_code)`, unlike path A which updates in place. |
 | D-6 | `emailServices.js:856` | The catch logs and rethrows. `prService.js:166` awaits inside a `for await` loop over `[vendorLvl1, vendorLvl2]`, so a throw for lvl1 aborts lvl2 as well. |
 
-### Failure chain that reproduces the report
+### ~~Failure chain that reproduces the report~~ — VOID (2026-09-02)
+
+**This chain cannot occur.** Its first step is D-1, which is not a defect (see the correction
+above): the nested array does not match zero rows, so `getdata` is never emptied by it and the
+TypeError is never reached from this direction. The chain is kept only so the retraction is
+traceable.
 
 ```
 prService.js:166  resendEmailVendors({ ..., item_codes: [...] })
         ↓
-emailServices.js:735   item_code IN (('A','B'))        ← D-1, matches nothing
-        ↓
-emailServices.js:738   getdata = []
+emailServices.js:735   item_code IN (('A','B'))        ← D-1: WRONG, Sequelize flattens this
+        ↓                                                to IN ('A','B') and matches normally
+emailServices.js:738   getdata = []                    ← does NOT happen
         ↓
 emailServices.js:743   itemIdsToUpdate = []  → no status update this iteration
         ↓
@@ -70,16 +101,26 @@ emailServices.js:856   rethrow  → aborts the vendor loop in prService.js:164
 rfqTokenEmail row never created → vendor link 404/invalid
 ```
 
-D-4 explains the variant where status *is* already `RFQ_SENT_TO_VENDOR` but no token
-exists (throw occurring after the status update, e.g. missing SLA config via D-3).
+**What the evidence actually supports.** D-4 (status mutated before the token is written) is the
+mechanism that produces the reported "marked as sent, no working link" state, and it is measurable:
+12 scopes sit at `status_milestone = 2` with no active vendor token in the production copy. D-5
+(unconditional `create`) is likewise measurable: 199 scopes hold more than one active vendor token.
+Neither explains `RFQ0002052` specifically, whose `status_vendor = null` alongside milestone 2
+cannot be produced by any dispatch path in the codebase.
+
+D-4 explains the state where status *is* already `RFQ_SENT_TO_VENDOR` but no token exists — a
+throw occurring after the status update, e.g. missing SLA config via D-3. This is the mechanism
+with measured production impact (12 scopes), and it does not depend on the void D-1.
 
 ## Proposed behavior
 
 Smallest complete change, confined to `resendEmailVendors` plus the shared helper it
 adopts. No schema change, no migration, no new endpoint.
 
-1. **Fix the scope filter (D-1 → FR-1).** `clause.item_code = { [Op.in]: item_codes }`.
-   Keep the `Array.isArray` guard so the key is omitted when `item_codes` is absent (AC-2).
+1. ~~**Fix the scope filter (D-1 → FR-1).**~~ **Code hygiene only, fixes no behaviour** — see the
+   D-1 correction above. `clause.item_code = { [Op.in]: item_codes }` emits the same SQL as the
+   nested form. Keep the `Array.isArray` guard so the key is omitted when `item_codes` is absent
+   (AC-2) — that guard is what actually matters here, and it was already correct.
 2. **Guard the empty set (D-2 → FR-2, AC-3).** After `getPRDetails`, return a structured
    outcome (e.g. `{ sent: false, reason: 'NO_ELIGIBLE_ITEMS' }`) before touching `getdata[0]`.
 3. **Remove the `res` references (D-3 → FR-3, AC-4).** Replace both `sendResponse(res, ...)`
@@ -111,7 +152,7 @@ adopts. No schema change, no migration, no new endpoint.
 
 | Repository/component | Current symbol/path | Proposed change |
 |---|---|---|
-| aigen-backend | `resendEmailVendors` — `src/services/emailServices.js:704-857` | Fix D-1..D-5; delegate token persistence to the shared helper; return a structured outcome |
+| aigen-backend | `resendEmailVendors` — `src/services/emailServices.js:704-857` | Fix D-2..D-5 (D-1 is void — hygiene only); delegate token persistence to the shared helper; return a structured outcome |
 | aigen-backend | `EmailHelper.generateVendorQutationLink` — `src/helper/emailHelper.js:16-88` | Reused as-is. Change only if path B needs a parameter it does not expose |
 | aigen-backend | `prService.js:164-175` | Consume the structured outcome; decide loop-continuation policy (OI-6) |
 | aigen-backend | `emailController.sendRequestForQuotation` — `src/controllers/emailController.js:390` | Apply the D-4 reordering only. No other change |
@@ -167,7 +208,7 @@ return value, so this is backward compatible — but each must be checked (task 
 
 | Alternative | Reason accepted/rejected |
 |---|---|
-| Fix only D-1 (the `Op.in` bug) | **Rejected.** Restores the happy path but leaves D-2/D-3/D-4, so any other failure still yields "sent, no token" |
+| ~~Fix only D-1 (the `Op.in` bug)~~ | **Moot (2026-09-02).** D-1 is not a bug, so this alternative would have fixed nothing at all. The real value of this change sits in D-4 and D-5. |
 | Create the token during `submitRFQ` (at launch) | **Rejected.** Changes intended launch/dispatch separation and would issue tokens for RFQs never dispatched; expiry is derived at dispatch time |
 | Add a reconciliation cron that backfills missing tokens | **Rejected as the primary fix.** Treats the symptom; may still be worth proposing separately for already-affected RFQs (OI-3) |
 | Wrap everything in one DB transaction | **Partially rejected.** The email send cannot participate; reordering achieves the goal with less plumbing |
@@ -177,7 +218,7 @@ return value, so this is backward compatible — but each must be checked (task 
 
 | Risk | Likelihood/impact | Mitigation |
 |---|---|---|
-| Fixing D-1 makes the expiry path actually dispatch emails that never sent before, causing a burst of vendor emails on first deploy | Medium / High | Verify eligible-row counts on a non-production environment before deploy; consider a staged rollout and notify CS |
+| ~~Fixing D-1 makes the expiry path actually dispatch emails that never sent before, causing a burst of vendor emails on first deploy~~ | **VOID (2026-09-02)** | This risk depended on D-1 having suppressed rows. It never did — the clause matched normally all along, so no backlog of undispatched RFQs was accumulating and no burst is possible. The "count eligible rows before deploy" step this risk generated is no longer a release gate. |
 | Reordering status updates changes what dashboards show mid-flight | Medium / Medium | Confirm no dashboard query depends on `RFQ_SENT_TO_VENDOR` being set before the email; check `dashboardHelper.js` |
 | Switching to the shared helper changes token expiry or payload shape versus the inline version | Medium / High | Diff the two payloads field by field before switching (task I-5); assert payload equivalence in a unit test |
 | Existing production rows already have duplicate active tokens | Unknown / Medium | Detect via the OI-5 query; remediate separately |
@@ -186,8 +227,8 @@ return value, so this is backward compatible — but each must be checked (task 
 
 ## Rollout and rollback
 
-- Feature flags: none proposed. If the email-burst risk is judged unacceptable, gate the D-1
-  fix behind a config value for one release.
+- Feature flags: none proposed. The email-burst risk that previously motivated a flag is void
+  (see Risks) — D-1 never suppressed dispatches, so there is no backlog to release at once.
 - Deploy order: `aigen-backend` only. No frontend or importer coordination required.
 - Migration order: N/A.
 - Monitoring after deploy: watch dispatch-failure log lines (FR-7), Sentry volume, outbound

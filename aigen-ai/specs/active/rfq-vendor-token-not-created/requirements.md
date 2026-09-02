@@ -58,8 +58,10 @@ emailed link. When dispatch cannot complete, the RFQ must not be left displaying
 
 ## Functional requirements
 
-- **FR-1:** `resendEmailVendors` must filter by item scope correctly when `item_codes` is supplied,
-  returning the matching `rfq_library` rows rather than an empty set.
+- ~~**FR-1:**~~ **WITHDRAWN 2026-09-02.** This requirement was written on the belief that the
+  nested `Op.in` array returned an empty set. It does not — Sequelize normalises it and the SQL is
+  identical either way (see the correction in `design.md`). The scope filter was never broken.
+  What must hold, and already did, is that an absent `item_codes` omits the clause entirely (AC-2).
 - **FR-2:** When the resolved item set is empty, `resendEmailVendors` must return a structured,
   logged outcome to its caller instead of throwing on `undefined`.
 - **FR-3:** Guard clauses inside `resendEmailVendors` must not reference an undefined `res`;

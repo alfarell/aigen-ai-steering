@@ -29,7 +29,8 @@ from this delivery.
 
 Ordered by dependency. Each item is independently revertable.
 
-- [x] **I-1 (D-1, FR-1):** `src/services/emailServices.js:735` — change
+- [x] **I-1 (D-1, FR-1) — applied, but fixes no behaviour.** D-1 was later proven not to be a
+      defect (see `design.md`); the change is code hygiene only. `src/services/emailServices.js:735` — change
       `clause.item_code = { [Op.in]: [item_codes] }` to `{ [Op.in]: item_codes }`.
       Keep the surrounding `Array.isArray(item_codes)` guard so the clause is omitted when absent.
 - [x] **I-2 (D-2, FR-2):** `src/services/emailServices.js:759` — add an empty-set guard before
@@ -94,8 +95,9 @@ vendor codes, or real email addresses into test data.
       (identical 11 failures). No new regression.
 - [x] Frontend: N/A — no change. `aigen-frontend` working tree untouched and clean.
 - [x] Import worker: N/A — no change. `aigen-import-pr` working tree untouched and clean.
-- [ ] Confirm the email-burst risk (`design.md`, Risks) on a non-production environment before
-      deploy: count rows the fixed `item_code` clause now matches.
+- [x] ~~Confirm the email-burst risk before deploy~~ — **VOID 2026-09-02.** The risk assumed D-1
+      had been suppressing dispatches. It never did (see `design.md`), so there is no backlog and
+      no burst. This is no longer a release gate.
 - [x] Check whether any dashboard query depends on `RFQ_SENT_TO_VENDOR` ordering
       (`src/helper/dashboardHelper.js`) before shipping I-4 — **verdict: safe to reorder.**
       Every reference is `status_milestone IN (...)` list membership, never an ordering or
