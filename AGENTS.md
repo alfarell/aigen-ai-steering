@@ -8,26 +8,67 @@ This workspace contains three independently versioned repositories that together
 
 The shared project knowledge base is `aigen-ai/` (intentionally not `.ai/`). Source code and executable configuration remain authoritative.
 
+These instructions are shared by Codex and Claude Code. Treat repository evidence as the source of truth.
+
+## Operating rules
+
+- Read this file and the closest relevant repository instructions before working.
+- Read only the documentation needed for the current task.
+- Search before opening large files or scanning broad directories.
+- Distinguish confirmed findings from assumptions.
+- Do not invent APIs, fields, tables, payloads, roles, states, commands, or business rules.
+- Preserve behaviour outside the requested scope.
+- Avoid unrelated refactors, dependency upgrades, and formatting churn.
+- Never expose secrets from environment files, credentials, logs, or command output.
+- Do not commit, push, merge, deploy, modify external systems, or run destructive database operations unless explicitly requested.
+
 ## Required workflow
 
 Before editing:
 
 1. Read this file and the relevant documents under `aigen-ai/`.
-2. Inspect the actual affected source; never rely on an index alone.
+2. Inspect the actual affected source; never rely on an index alone. Confirm the current execution path and the tests that cover it.
 3. Check `git status --short` inside every affected repository and preserve existing changes.
 4. Identify affected repositories, modules, interfaces, data stores, jobs, security boundaries, and tests.
-5. For any behavioral change, create or update a specification under `aigen-ai/specs/active/<feature>/`.
-6. Write a concise implementation and verification plan before changing code.
+5. Identify assumptions that could cause security, data-loss, or contract risks.
+6. For any behavioral change, create or update a specification under `aigen-ai/specs/active/<feature>/`.
+7. Write a concise implementation and verification plan before changing code.
 
-During and after implementation:
+During implementation:
 
-7. Implement the smallest complete change consistent across affected repositories.
-8. Add or update tests at the closest useful level. If no test harness exists, state the gap and add one only when it is in scope.
-9. Run every relevant available local verification command. Never substitute an invented command.
-10. Update affected files in `aigen-ai/index/`, `aigen-ai/context/project-state.md`, and the active specification.
-11. Review each repository's final diff. Report commands, results, blockers, and unverified behavior.
+8. Implement the smallest complete change consistent across affected repositories.
+9. Match existing architecture, naming, and patterns.
+10. Preserve API and data compatibility unless the task explicitly changes them.
+11. Consider authorisation, nullability, retries, duplicate processing, idempotency, concurrency, audit history, and rollback when relevant.
+12. Add or update focused tests at the closest useful level. If no test harness exists, state the gap and add one only when it is in scope.
+
+Before completion:
+
+13. Run the narrowest meaningful checks first, then every relevant available lint, type-check, test, and build command discovered in the repository. Never substitute an invented command.
+14. Separate new failures from pre-existing or environmental failures. Never claim a check passed unless it completed successfully.
+15. Update affected files in `aigen-ai/index/`, `aigen-ai/context/project-state.md`, and the active specification.
+16. Inspect `git diff --check`, `git status`, and each repository's final diff. Report commands, results, blockers, and unverified behavior.
 
 Do not change dependencies, environments, migrations, CI/CD, or production behavior unless the task explicitly requires it. Do not expose values from `.env`, `.env.*`, credentials, tokens, or private API documentation.
+
+## Agent workflow
+
+Use specialist agents for non-trivial work:
+
+1. **Requirements Analyst** when the requirement, actors, states, permissions, data rules, or acceptance criteria are incomplete.
+2. **Scout** when relevant files, symbols, flows, schemas, integrations, or tests are not already known.
+3. **Implementation Planner** for cross-module, integration, migration, or multi-file work.
+4. **Implementer** after the expected behaviour and change surface are grounded.
+5. **Test Verifier** after implementation.
+6. **Code Reviewer** against the actual final diff and acceptance criteria.
+
+Execution constraints:
+
+- Parallelise only independent read-heavy exploration, test analysis, or review.
+- Use only one code-writing agent at a time.
+- Do not let agents edit overlapping files concurrently.
+- Pass concise findings between agents; do not make every agent rediscover the repository.
+- Tiny, well-understood changes may skip unnecessary agents.
 
 ## Repository commands
 
@@ -97,6 +138,26 @@ The worker and one-shot import mutate databases and may send emails. Do not run 
 - Do not assume the import worker's `Database.transaction()` covers calls made through `this.db.connection(...).query(...)`; inspect and test the actual connection used.
 - Use existing response/error helpers, validation schemas, Sentry reporting, and timestamped logging patterns where present.
 - Never edit generated dependencies, build output, coverage output, caches, or large assets as part of normal feature work.
+
+## Final report
+
+For implementation tasks, report:
+
+1. Summary of changes.
+2. Files changed and why.
+3. Exact validation commands and outcomes.
+4. Acceptance-criteria coverage.
+5. Remaining risks or manual checks.
+6. Scope deviations, or `None`.
+
+For investigation tasks, report:
+
+1. Repository ownership.
+2. Relevant files and symbols.
+3. Current execution and data flow.
+4. Evidence-backed likely causes or change surface.
+5. Existing tests and commands.
+6. Risks and unknowns.
 
 ## Context entry points
 
