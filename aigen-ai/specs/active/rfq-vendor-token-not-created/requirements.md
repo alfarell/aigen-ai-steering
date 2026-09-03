@@ -96,9 +96,12 @@ emailed link. When dispatch cannot complete, the RFQ must not be left displaying
   items and the right to submit a quotation for them.
 - Sensitive data/logging constraints: never log the JWT itself, `jwtConfig.secret`, vendor email
   addresses, or production identifiers in test fixtures. Log token presence/absence, not value.
-- Abuse or replay considerations: FR-6 exists partly for security — multiple simultaneously active
-  tokens for one vendor/batch widen the revocation surface. Deactivating a token must reliably
-  revoke access.
+- Abuse or replay considerations: **rationale corrected 2026-09-02.** FR-6 was justified as
+  narrowing the revocation surface. Measured against production data that justification does not
+  hold: no scope ever held two simultaneously usable tokens (859 active rows, only 51 unexpired,
+  and zero scopes with more than one active *and* unexpired). FR-6 stands for a different reason —
+  the expiry cron treats an active-but-expired row as a work item, so duplicates cause duplicate
+  escalation. Deactivating a token must still reliably revoke access.
 
 ## Acceptance criteria
 

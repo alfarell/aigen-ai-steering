@@ -74,7 +74,7 @@ It signs its own JWT (`:796`) and calls `rfqTokenEmail.create()` (`:802`) uncond
 | D-2 | `emailServices.js:759-761` | `const firstItem = getdata[0]` with no empty guard, immediately destructured at `:761`. Throws `TypeError: Cannot destructure property 'cs_id' of 'undefined'` whenever the eligibility filter genuinely matches nothing — e.g. every item for that vendor already submitted. (The original text attributed the empty set to D-1; that attribution is void, but the missing guard is real and reachable on its own.) Path A has this guard (`emailController.js:437`); path B does not. |
 | D-3 | `emailServices.js:709`, `:774` | `sendResponse(res, ...)` references `res`, which is **not a parameter** — the signature is `(request)` (`:704`). Both guard branches throw `ReferenceError: res is not defined` instead of returning. This masks the real cause (missing `rfq_number`, missing SLA config) behind a misleading error. |
 | D-4 | `emailServices.js:743-757` vs `:802` | Status is mutated to `RFQ_SENT_TO_VENDOR` **before** the token is created, with no transaction. Anything throwing in between (D-2, D-3, SLA lookup, JWT) leaves the RFQ marked "sent to vendor" with no token and no email — the exact reported symptom. Path A has the same ordering hazard (`emailController.js:447` before `:570`). |
-| D-5 | `emailServices.js:802` | `rfqTokenEmail.create()` is unconditional. Repeated dispatch accumulates multiple active rows for one `(rfq_number, vendor_batch, vendor_code)`, unlike path A which updates in place. |
+| D-5 | `emailServices.js:802` | `rfqTokenEmail.create()` is unconditional. Repeated dispatch accumulates multiple active rows for one `(rfq_number, vendor_batch, vendor_code)`, unlike path A which updates in place. **Harm restated 2026-09-02:** the original text implied duplicate *usable links*. Measured against a production copy, that never happens — **zero** scopes hold more than one token that is both active and unexpired. The real harm is duplicate **work items**: `getExpiredRFQTokenEmailByConfig` selects `is_active = true` AND `date_expired <= now` as expiry-cron work, and **198 of 199** duplicate scopes hold two such rows, so those RFQs are escalated twice. |
 | D-6 | `emailServices.js:856` | The catch logs and rethrows. `prService.js:166` awaits inside a `for await` loop over `[vendorLvl1, vendorLvl2]`, so a throw for lvl1 aborts lvl2 as well. |
 
 ### ~~Failure chain that reproduces the report~~ — VOID (2026-09-02)
@@ -189,8 +189,10 @@ return value, so this is backward compatible — but each must be checked (task 
 ## Security
 
 - Backend authorization: unchanged. `tokenMiddleware` remains the sole gate for vendor access.
-- Token lifetime/purpose/revocation: unchanged expiry derivation (BR-2). FR-6 *improves*
-  revocation by ensuring one active row per scope instead of an unbounded set.
+- Token lifetime/purpose/revocation: unchanged expiry derivation (BR-2). FR-6 keeps one active row
+  per scope. **Rationale corrected 2026-09-02:** this is not primarily about revocation surface —
+  no scope ever held two simultaneously usable tokens. It is about the expiry cron, which treats an
+  active-but-expired row as a work item, so a second row means the RFQ is escalated twice.
 - Validation: `item_codes` must be validated as an array of strings before entering the
   `Op.in` clause.
 - Logging/redaction: log token presence and expiry, never the JWT value or the signing secret.

@@ -550,3 +550,81 @@ case kept alongside.
 After: **199 passed, 20 failed, 219 total** — the same 20 pre-existing failures in
 `tests/repository/rfqLibrary.dicReminder.test.js` and `tests/controllers/qcfController.dicReminder.test.js`.
 51 tests added across 11 new files. `git diff --check` clean.
+
+## D-7 — premature link invalidation on resend (found and fixed 2026-09-02)
+
+Raised by an independent analysis in another session and confirmed here.
+
+`EmailHelper.generateVendorQutationLink` always signed a fresh JWT and, when an active row already
+existed, `updateToken` **overwrote `rfq_token` in place**. The link already emailed to the vendor
+then matched no row, and `tokenMiddleware` (`src/middleware/tokenMiddleware.js:25`) answered 401
+`Token not found in database.` — precisely "the vendor cannot open the RFQ detail from the link
+that was sent". The function has always accepted an `old_token` parameter for exactly this, and no
+caller ever passed it.
+
+**This work made it worse before it made it better.** Converging path B onto the shared helper
+(the D-5 fix) replaced `rfqTokenEmail.create()` — which left the previous row active until its own
+`date_expired`, so the older emailed link kept working — with an in-place overwrite that kills the
+older link immediately. The dedupe was still right for the expiry pipeline, but it traded a
+harmless overlap for an immediate invalidation on the very symptom this spec exists to fix.
+
+**Fix applied** in `src/helper/emailHelper.js`. The two cases separate cleanly on the existing
+row's expiry:
+
+| Existing row | Behaviour |
+|---|---|
+| Unexpired **and** same item scope | Reuse the stored token. `rfq_token` and `date_expired` are left untouched, so the emailed link keeps working |
+| Expired | Issue a new token — the old link was already dead, so rotation costs nothing |
+| Item scope changed | Issue a new token |
+| `old_token` supplied explicitly | Honoured, unchanged |
+| No row | Create, unchanged |
+
+Exactly one active row is preserved in every branch, so the expiry-cron work-item semantics that
+D-5 protects are unaffected.
+
+Two constraints shaped this and must not be undone:
+
+- `date_expired` is deliberately **not** extended when the token is reused. A JWT's `exp` cannot be
+  extended without re-signing, and a row claiming validity past its own JWT's `exp` would produce a
+  confusing `Token has expired` 401.
+- Reuse requires an unchanged item set because `prController.listItemRFQVendor` scopes its query by
+  the `items` array carried **inside** the JWT (`params.id = { [Op.in]: items }`). Reusing a token
+  whose scope has changed would show the vendor the wrong items.
+
+Covered by `tests/helper/emailHelper.generateVendorQutationLink.test.js` (7 tests), including a
+defensive case for `rfq_item_ids` arriving as a JSON string and an assertion that no token value is
+logged. Suite after the fix: **206 passed, 20 failed, 226 total** — the same 20 pre-existing
+`dicReminder` failures.
+
+Scope note: only `generateVendorQutationLink` was changed. The sibling `generate*Link` helpers
+(DIC, OE revision, not-submitted) share the same rotate-in-place shape and were left alone.
+
+## How a PR reaches iSourcing, and the token's role
+
+Investigated because the business goal moved to getting `RFQ0002052` transferred into the
+`task_board` schema.
+
+**The path.** `POST /pr/cs/send_isourcing/:rfq_number/:vendor_batch`
+(`src/routes/purchaseRoutes.js:198`), behind `authenticateToken` plus roles CS/CL/ADMIN, reaching
+`qcfController.sendActionToCS`. `rfq_tipe` is read from the **request body**, not from a column, so
+an RFQ does not need `tipe_rfq` preset. When it is `isourcing`, the handler calls
+`prosesToIsourcing(pr_number, server_groups, itemsToUpdate)` (`qcfController.js:1103`), which writes
+the `task_board` schema. On success, in one transaction, `bulkUpdateStatusRFQ` moves the items to
+`status_milestone = 12` (ISOURCING) and `rfqTokenStoreRepository.deactivateTokens` closes the vendor
+token. 1,225 RFQs / 3,398 items already sit at milestone 12, so the path works.
+
+**The token's role — it is not an input.** The transfer never reads the token value; the only
+`rfq_token` references in `qcfController.js` belong to DIC tokens. The vendor token is a *pipeline
+marker*: active means the RFQ is still with the vendor (awaiting a quotation, or awaiting expiry
+escalation); deactivating it on a successful transfer takes the RFQ out of that flow. This is why
+the D-7 rotation fix is safe for iSourcing — changing the token string cannot break a transfer
+lookup, because no such lookup exists.
+
+**What `RFQ0002052` is missing.** `tipe_rfq` null, `sourcing_reason`/`sourcing_notes` null,
+`status_milestone = 2`, and no `qcf_library` row for item `5713`. The absent vendor token is **not**
+a blocker — the transfer does not require one. What it needs is the CS action above with
+`rfq_tipe: 'isourcing'` and `items: [5713]`.
+
+**Unverified, and the one thing that could block it:** `qcfWorkflowPolicy.canManualSource` is
+evaluated against the `qcf_library` rows for the submitted items, and item `5713` has none. Whether
+an empty set is permitted or rejected was not traced. Check this before attempting the transfer.
