@@ -1,10 +1,41 @@
 # Requirements — SAP Auto-PO: item_code format mismatch and missing request-payload persistence
 
-Status: Planned
+Status: Partially implemented (D2 implemented 2026-10-12; D1 Planned)
 Owner: Unknown
 Repositories: backend (`aigen-backend`)
 Created: 2026-09-21
-Last updated: 2026-09-21
+Last updated: 2026-10-12
+
+## Implementation status
+
+| Defect | Requirements | Status |
+|---|---|---|
+| D1 - `item_code` format-sensitive comparison | FR-1, FR-2, FR-3, FR-4, FR-7; AC-1 to AC-8 | **Planned** (not started) |
+| D2 - SAP request payload not persisted | FR-5, FR-6, FR-8; AC-9 to AC-12 | **Implemented separately on 2026-10-12**, triggered by the RFQ0002018 investigation, ahead of D1 |
+
+D2 shipped on its own because it is independent of D1 and is what lets the SAP
+team inspect the exact payload of a failed attempt. D2 delivered:
+
+- Migration `aigen-backend/migrations/aigen/20261012220615-create-log-sap-sync.{up,down}.sql`.
+- Model `aigen-backend/src/models/default/logSapSync.js`.
+- Repository `aigen-backend/src/repository/sapSyncLog.repository.js`
+  (`logSapSyncAttempt`, never throws, truncates `error_message` at 5000 chars).
+- Call sites in `syncAutoPO` (`source: 'cl_approval_sync'`) and `getSyncSAP`
+  (`source: 'cron_sync'`): one row per attempt that reached `axios.post`, written
+  right after the SAP response (success or business rejection) or in the `catch`
+  for a transport error. Request body only; headers and the Basic-auth token are
+  never persisted.
+- Tests: `aigen-backend/tests/repository/{sapSyncLog.repository,rfqLibrary.syncAutoPO.sapSyncLog,PurchaseRequest.getSyncSAP.sapSyncLog}.test.js`.
+
+AC-9, AC-10 and AC-11 are covered by those unit tests. **AC-12 (apply the
+migration up then down on a scratch database) is a manual check still to be
+performed.** D1 behavior is unchanged: no `item_code` normalization, no
+primary-key update, no classifier change.
+
+**Deploy note:** run the migration (`npm run migrate -- up --db=aigen`) **before**
+deploying the backend code. The code inserts into `log_sap_sync`; without the table
+each attempt only emits a `console.error` (the insert is swallowed, so PO sync is
+not affected), but no payload is persisted.
 
 ## Background and problem
 

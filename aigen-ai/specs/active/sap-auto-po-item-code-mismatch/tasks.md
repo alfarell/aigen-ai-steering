@@ -3,6 +3,11 @@
 All work is in `aigen-backend`. No frontend, mobile, or `aigen-import-pr` change
 is required — see `requirements.md` Scope for why.
 
+> **Status 2026-10-12:** D2 (Backend 3, 4, 5, 7, 8 and their tests) is implemented
+> separately, triggered by the RFQ0002018 investigation. D1 (Backend 1, 2, 6) is
+> still Planned. Deploy order: run the migration before deploying the code. AC-12
+> (migration up/down on a scratch database) is still a manual check.
+
 ## Discovery
 
 - [x] Verify current behavior and reproduction evidence. Call chain traced from
@@ -41,17 +46,17 @@ Execute in this order; each step lists what it depends on.
       `parseOrderedInFullLines`, `compareOrderedInFullScope`,
       `classifySapFailure`, or the module exports. Depends on: Backend 1.
       Covers FR-7.
-- [ ] **Backend 3 — migration.** Run
+- [x] **Backend 3 — migration.** *(D2, done 2026-10-12: `20261012220615-create-log-sap-sync`.)* Run
       `npm run migrate:create -- --db=aigen --name=create-log-sap-sync` and fill
       in the up/down SQL for `log_sap_sync` per the Data design table in
       `design.md`, following the raw-SQL convention of
       `aigen-backend/migrations/aigen/20260823202433-create-isourcing-transfer-requests.{up,down}.sql`.
       Index `qcf_number` and `created_at`. Depends on: nothing.
-- [ ] **Backend 4 — model.** Create
+- [x] **Backend 4 — model.** *(D2, done 2026-10-12.)* Create
       `aigen-backend/src/models/default/logSapSync.js` with
       `tableName: 'log_sap_sync'` and `timestamps: false`, following
       `aigen-backend/src/models/default/logSap.js`. Depends on: Backend 3.
-- [ ] **Backend 5 — log repository.** Create
+- [x] **Backend 5 — log repository.** *(D2, done 2026-10-12; arguments are snake_case: `qcf_number, pr_number, source, request_payload, response_payload, http_status, success, error_message`.)* Create
       `aigen-backend/src/repository/sapSyncLog.repository.js` exporting
       `logSapSyncAttempt({ qcf_number, pr_number, source, requestPayload,
       responsePayload, httpStatus, success, errorMessage })`. Guard the insert so
@@ -71,7 +76,7 @@ Execute in this order; each step lists what it depends on.
       `qcf_number`, `dt.PR_NUMBER`, `dt.PR_ITEM`, and `dt.PO_NUMBER`, and continue
       without throwing. Do not change the outbound payload or the SELECT.
       Depends on: Backend 1. Covers FR-3, FR-4.
-- [ ] **Backend 7 — `syncAutoPO` payload persistence.** Call
+- [x] **Backend 7 — `syncAutoPO` payload persistence.** *(D2, done 2026-10-12; the success and rejection rows are written by one call right after the SAP response.)* Call
       `logSapSyncAttempt` with `source: 'cl_approval_sync'` at three points:
       after a success response (`~:1880-1907`), after a non-success response
       (`~:1946-1965`), and in the `catch` block (`~:1994-2019`). In the catch, use
@@ -79,7 +84,7 @@ Execute in this order; each step lists what it depends on.
       transport error with no response body still produces a usable row. Store the
       request body only — never headers. Depends on: Backend 5.
       Covers FR-5, FR-6, FR-8.
-- [ ] **Backend 8 — `getSyncSAP` payload persistence.** Call
+- [x] **Backend 8 — `getSyncSAP` payload persistence.** *(D2, done 2026-10-12.)* Call
       `logSapSyncAttempt` with `source: 'cron_sync'` at the three equivalent
       points in `aigen-backend/src/repository/PurchaseRequest.repository.js:2094`
       (success `~:2205-2226`, failure `~:2281-2296`, catch `~:2307-2334`).
@@ -118,11 +123,14 @@ Execute in this order; each step lists what it depends on.
 - [ ] In the same file, assert the unmatched-entry and zero-`affectedCount` cases
       log through `console.error` and `logActivity` and do not throw.
       Covers AC-3, AC-4.
-- [ ] In the same file, assert exactly one `logSapSyncAttempt` call per attempt
+- [x] *(D2, done 2026-10-12 in `tests/repository/rfqLibrary.syncAutoPO.sapSyncLog.test.js`.)*
+      In the same file, assert exactly one `logSapSyncAttempt` call per attempt
       across success, business rejection, and thrown transport error, with
       `source: 'cl_approval_sync'`, and assert the persisted `requestPayload`
       contains no `Authorization` or `tokenAuth` key. Covers AC-9, AC-11.
-- [ ] Create `aigen-backend/tests/repository/PurchaseRequest.getSyncSAP.test.js`
+- [x] *(D2, done 2026-10-12 as `tests/repository/PurchaseRequest.getSyncSAP.sapSyncLog.test.js`;
+      payload-persistence assertions only, matching assertions remain D1.)* Create
+      `aigen-backend/tests/repository/PurchaseRequest.getSyncSAP.test.js`
       asserting the equivalent persistence with `source: 'cron_sync'` across the
       same three outcomes. Covers AC-10.
 - [ ] Confirm AC-2 through the existing controller suite
