@@ -1,10 +1,13 @@
 # Requirements — Vendor revision resubmission must include a newly uploaded quotation document
 
 Status: Implemented (frontend, backend), not yet released  
+Branches: aigen-frontend `fix/prod-issue-23-quotation-vendor` (c212d82); aigen-backend
+`fix/prod-issue-23-quotation-vendor` (8eb46e17) and, ported onto `develop-dot-clone`,
+`fix/prod-issue-23-quotation-vendor-dot-clone` (90d44820) — see "Backend port onto develop-dot-clone"  
 Owner: Unknown  
 Repositories: aigen-frontend, aigen-backend (no DB schema change, no route change, additive response field)  
 Created: 2026-10-12  
-Last updated: 2026-10-12
+Last updated: 2026-10-13
 
 ## Background and problem
 
@@ -44,9 +47,12 @@ mandatory, so revised prices are never approved against an outdated document.
     `getApprovalQCFByManagementToken`).
 - Excluded (follow-ups):
   - `prController.getApprovalRFQByCl` (`GET /pr/cl/need_approval_items/:rfq_number/:vendor_batch`, ~3501):
-    its document lookup is RFQ-wide (no vendor) and its items carry no quotation date; the frontend does not
-    call it. Unchanged.
-  - The vendor-side header lookups in `prController.js` (~282, ~430) that also use `is_latest`.
+    its items carry no quotation date and the frontend does not call it, so it gets no `documentOutdated`.
+    Unchanged on `fix/prod-issue-23-quotation-vendor`; on the `develop-dot-clone` port its lookup is scoped
+    to the vendor (see "Backend port onto develop-dot-clone").
+  - The vendor-side header lookups in `prController.js` (~282, ~430) that also use `is_latest`. Verified
+    2026-10-13: both already filter by `vendorCode`, so they show the vendor's own latest upload; no change
+    needed.
   - Persisting the price-out-of-band flag (`prController.js` ~1101-1117) - implemented separately.
   - SAP payload logging (spec `sap-auto-po-item-code-mismatch`, D2) - implemented separately.
   - The double upload on "Lanjutkan tanpa revisi".
@@ -206,7 +212,31 @@ mandatory, so revised prices are never approved against an outdated document.
 
 - Resolved: `log_quotation` status 'request revision by dic' (`item_id` = `rfq_library.id`) marks the
   revision request.
-- Follow-up: `getApprovalRFQByCl` (RFQ-level CL approval, no frontend caller) still uses `is_latest`.
+- Follow-up: `getApprovalRFQByCl` (RFQ-level CL approval, no frontend caller) still uses `is_latest` and has
+  no `documentOutdated`; on the `develop-dot-clone` port it is vendor-scoped when the items have one vendor.
+- Follow-up (security): `POST /upload/document` (`uploadRoutes.js:29`, `uploadSingleDocument`) has no auth and
+  takes `rfq_number` and `vendor_code` from the body, so the FR-8 check ("a document was uploaded after the
+  revision request") can be satisfied by any upload for that RFQ and vendor. FR-8 prevents the accidental
+  repeat of RFQ0002018, not a deliberate bypass. Binding uploads to the vendor token is a separate change.
 - Follow-up: the read-time price-out-of-band flag on the DIC and CL/Management screens is specified in
   `../qcf-price-out-of-range-flag/requirements.md`.
 - Should `FileInput` display the newly selected file name instead of the old one in revision mode?
+
+## Backend port onto develop-dot-clone (2026-10-13)
+
+`develop-dot-clone` diverged from the base of `fix/prod-issue-23-quotation-vendor` (merge-base 449e4c68), so
+the backend fix was ported to branch `fix/prod-issue-23-quotation-vendor-dot-clone` (commit 90d44820, not yet
+pushed):
+
+- Ported from 8eb46e17: FR-7..FR-10 (`bulkUpdateRfqStatusVendor` revision-document check,
+  `Document.repository.js` helpers, `getApprovalQCFBy*` with `documentOutdated`) and the price-out-of-range
+  flag of `../qcf-price-out-of-range-flag/requirements.md`, with their tests.
+- Not ported: the `log_sap_sync` payload logging (D2 of `../sap-auto-po-item-code-mismatch/`), because
+  `develop-dot-clone` already persists SAP payloads in `sap_sync_log` (commit 86846202). Commit 38718259 is
+  also not needed (equivalent fba51580 is on `develop-dot-clone`).
+- Added: `getApprovalRFQByCl` scopes its document lookup to the single `vendor_code` of the approved items;
+  with zero or several vendors it falls back to the newest RFQ-wide document (`createdAt DESC`). Test:
+  `tests/controllers/prController.getApprovalRFQByCl.documentVendor.test.js`.
+- Validation: full jest suite 52/52 suites, 345/345 tests; independent verification and code review passed
+  (no blocking findings). Tests mock the database; no run against MySQL yet.
+- Deploy: no migration. Backend before frontend (`documentOutdated` is additive).

@@ -7,6 +7,11 @@ is required — see `requirements.md` Scope for why.
 > separately, triggered by the RFQ0002018 investigation. D1 (Backend 1, 2, 6) is
 > still Planned. Deploy order: run the migration before deploying the code. AC-12
 > (migration up/down on a scratch database) is still a manual check.
+>
+> **Note 2026-10-13:** that D2 implementation (`log_sap_sync`) exists only on
+> `fix/prod-issue-23-quotation-vendor`. `develop-dot-clone` already logs payloads in
+> `sap_sync_log` (commit 86846202); do not merge `log_sap_sync` on top of it. See
+> `requirements.md`, "Conflict with `develop-dot-clone`".
 
 ## Discovery
 

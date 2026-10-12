@@ -4,7 +4,7 @@ Status: Partially implemented (D2 implemented 2026-10-12; D1 Planned)
 Owner: Unknown
 Repositories: backend (`aigen-backend`)
 Created: 2026-09-21
-Last updated: 2026-10-12
+Last updated: 2026-10-13
 
 ## Implementation status
 
@@ -36,6 +36,22 @@ primary-key update, no classifier change.
 deploying the backend code. The code inserts into `log_sap_sync`; without the table
 each attempt only emits a `console.error` (the insert is swallowed, so PO sync is
 not affected), but no payload is persisted.
+
+**Conflict with `develop-dot-clone` (verified 2026-10-13):** the D2 work above lives only on
+`fix/prod-issue-23-quotation-vendor` (commit 8eb46e17). `develop-dot-clone` already persists SAP payloads
+through a different implementation (commit 86846202, "log SAP payloads", P-04):
+
+- Table `sap_sync_log` (migration `migrations/aigen/20260924120000-add-sap-sync-retry-and-log`): `qcf_number`,
+  `attempt`, `source`, `request_url`, `request_json`, `response_json`, `http_status`, `error_code`,
+  `error_message`.
+- Model `src/models/default/sapSyncLog.js`; written by `recordSapAttempt` / `completeSapAttempt` in
+  `rfqLibrary.repository.js` (`syncAutoPO`). `getSyncSAP` delegates to `syncAutoPO` (`source: 'retry'`).
+
+For `develop-dot-clone`, FR-5/FR-6/FR-8 are therefore met by `sap_sync_log`, and the `log_sap_sync` migration,
+model and repository must **not** be merged on top of it (duplicate logging). The port of the RFQ0002018 fix
+onto `develop-dot-clone` (`fix/prod-issue-23-quotation-vendor-dot-clone`) deliberately leaves D2 out. Decide
+which implementation survives before `fix/prod-issue-23-quotation-vendor` is merged anywhere that already
+contains 86846202. D1 is unaffected by this.
 
 ## Background and problem
 
