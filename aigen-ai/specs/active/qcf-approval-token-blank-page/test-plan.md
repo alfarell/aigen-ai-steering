@@ -1,19 +1,31 @@
 # Test plan — QCF approval email link opens a blank page
 
+## Status (2026-10-14)
+
+Service-level tests are implemented and passing. Component-level and
+router-resolution tests were **not** written: `@vue/test-utils`/jsdom are not
+installed, no dependency or Vitest config change was authorised, and importing
+`router/index.js` pulls in every page component and Vuetify (previously found to
+crash Vitest on CSS pre-bundling; not re-tried). AC-4 is removed (CS branch
+deleted by `c19bfc3`). AC-6..AC-10 are covered by manual staging verification
+only: no automated test guards the component's argument passing or the route
+entry.
+
 ## Acceptance-criteria mapping
 
 | Acceptance criterion | Test/verification | Level | Repository/file | Expected result | Status |
 |---|---|---|---|---|---|
-| AC-1 | `getQuotation('QCF0009999', 'test-token')` builds the CL token URL | Unit | `aigen-frontend/src/services/form/cl/QuotationSummaryCLService.test.js` (new) | Requests `/pr/cl/need_approval_qcf/token/test-token`; URL contains no `undefined` | Planned |
-| AC-2 | `getManagementQuotation('QCF0009999', 'test-token')` builds the Management token URL | Unit | same file | Requests `/pr/management/need_approval_qcf/token/test-token` | Planned |
-| AC-3 | Both functions with a falsy token build the `qcf_number` URL | Unit | same file | Requests `/pr/cl/need_approval_qcf/QCF0009999` and the Management equivalent, unchanged from current behavior | Planned |
-| AC-4 | CS read-only branch still calls `getCSQuotationByToken` with the route token | Component | `aigen-frontend/src/features/form/cl/action/QuotationSummaryCL.test.js` (new, **conditional**) | Called once with `'test-token'` | Blocked — see Automated coverage |
-| AC-5 | Neither function calls `useRoute()`; both run with no active component instance | Unit | `QuotationSummaryCLService.test.js` | No Vue injection warning; no throw; resolves normally | Planned |
+| AC-1 | `getQuotation('QCF0009999', 'test-token')` builds the CL token URL | Unit | `aigen-frontend/src/services/form/cl/QuotationSummaryCLService.test.js` (new) | Requests `/pr/cl/need_approval_qcf/token/test-token`; URL contains no `undefined` | Pass (2026-10-14) |
+| AC-2 | `getManagementQuotation('QCF0009999', 'test-token')` builds the Management token URL | Unit | same file | Requests `/pr/management/need_approval_qcf/token/test-token` | Pass (2026-10-14) |
+| AC-3 | Both functions with a falsy token build the `qcf_number` URL | Unit | same file | Requests `/pr/cl/need_approval_qcf/QCF0009999` and the Management equivalent, unchanged from current behavior | Pass (2026-10-14) |
+| AC-4 | CS read-only branch still calls `getCSQuotationByToken` with the route token | Component | `aigen-frontend/src/features/form/cl/action/QuotationSummaryCL.test.js` (new, **conditional**) | Called once with `'test-token'` | Removed — CS branch deleted by `c19bfc3` |
+| AC-5 | Neither function calls `useRoute()`; both run with no active component instance | Unit | `QuotationSummaryCLService.test.js` | `useRoute` (mocked) never called; no throw; resolves normally | Pass (2026-10-14) |
 | AC-6 | Loading state renders before the fetch resolves | Component | `QuotationSummaryCL.test.js` (**conditional**) | A visible loading node is present; rendered DOM is non-empty | Blocked |
 | AC-7 | 403 with `error_code` `NOT_AUTHORIZED` | Component (**conditional**) | same file | Error state renders; `router.replace('/page-forbidden')` called | Blocked |
 | AC-8 | 404 or `error_code` `QCF_NOT_FOUND` | Component (**conditional**) | same file | Error state renders; `router.replace('/page-expired')` called | Blocked |
 | AC-9 | Any rejection leaves a non-empty DOM | Component (**conditional**) | same file | Rendered DOM is never empty at any point | Blocked |
-| AC-1..AC-4, AC-6..AC-9 | Manual staging walkthrough | Manual | Manual scenarios below | Page renders; no blank page; dashboard and CS paths unregressed | Planned |
+| AC-10 | Hash `#/quotation-summary/token/test-token` resolves to `QuotationSummaryCLToken` | Router resolution | not written (needs the full router/Vuetify import graph) | Route matches and component renders | Manual only |
+| AC-1..AC-3, AC-6..AC-10 | Manual staging walkthrough | Manual | Manual scenarios below | Page renders; no blank page; dashboard path unregressed | Planned |
 
 Every acceptance criterion appears at least once. AC-4 and AC-6 through AC-9
 have **no automated coverage** unless the `@vue/test-utils` decision below is
@@ -112,13 +124,28 @@ token.
 
 | Command | Date | Result | Notes |
 |---|---|---|---|
-| `pnpm run lint` (in `aigen-frontend`) | | Planned | Build gates on `--max-warnings=0` |
-| `pnpm run test` | | Planned | Full Vitest suite |
-| `pnpm vitest run src/services/form/cl/QuotationSummaryCLService.test.js` | | Planned | AC-1, AC-2, AC-3, AC-5 |
-| `pnpm vitest run src/features/form/cl/action/QuotationSummaryCL.test.js` | | Blocked | AC-4, AC-6..AC-9; conditional on `@vue/test-utils` |
-| `pnpm run build` | | Planned | Confirms the lint-gated build passes |
+| `node_modules/.bin/eslint <4 changed files>` (in `aigen-frontend`) | 2026-10-14 | Pass, no output | `pnpm` not installed in the environment; used the local binary, no `--fix` |
+| `node_modules/.bin/eslint . --max-warnings=0` | 2026-10-14 | Pass, no output | The lint half of `pnpm run build` |
+| `node_modules/.bin/prettier --check` on changed files | 2026-10-14 | Pass after `--write` on `QuotationSummaryCL.vue` | The `<template v-else>` wrapper re-indents the page body, so the diff is large; `git diff -w` shows ~48 lines |
+| `node_modules/.bin/vitest run src/services/form/cl/QuotationSummaryCLService.test.js` | 2026-10-14 | Pass, 10 tests | AC-1, AC-2, AC-3, AC-5 |
+| `node_modules/.bin/vitest run` | 2026-10-14 | Pass, 3 files / 27 tests | Full suite |
+| `node_modules/.bin/vite build` | 2026-10-14 | Pass, built in ~25s | The build half of `pnpm run build`; `dist/` is git-ignored |
+| component / router tests | — | Not written | Needs `@vue/test-utils`/jsdom or the full router import graph; not authorised |
 
 ## Unverified behavior
+
+- **Update 2026-10-14:** the blank page is explained by commit `c19bfc3` removing
+  the `QuotationSummaryCLToken` route (no catch-all, so the hash renders nothing).
+  The first bullet below is superseded; it remains unverified in a browser.
+- **Release target is not decided** (which branch ships this; production lacks the
+  route today).
+- **Login is still required** by the backend (BR-2); the frontend guard sends an
+  unauthenticated visitor to `/login` with `auth.returnUrl = to.fullPath`. Whether
+  the login flow actually returns to the token URL afterwards is **unverified**.
+- **Session-expiry race (pre-existing, not changed):** on a `SESSION_*` 401 the
+  interceptor logs out, `router.replace('/login')` and resolves `undefined`; the
+  service then throws on `res.data`, and `load()` falls into the generic branch and
+  calls `router.push('/page-expired')`. Not verified in a browser.
 
 - **The blank page itself is not explained.** The confirmed defect explains why
   the request fails; it does not explain why the result is an empty page rather

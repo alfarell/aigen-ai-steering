@@ -1,5 +1,40 @@
 # Design — QCF approval email link opens a blank page
 
+## Implementation status (2026-10-14)
+
+Implemented in `aigen-frontend` on `develop-dot-clone`, uncommitted. Actual root
+cause on this branch and production: commit `c19bfc3` removed the
+`QuotationSummaryCLToken` route and the CS token branch; with no catch-all route
+the email hash matches nothing and the page is blank (see `requirements.md`
+update). The earlier fix `5f3c81b` (branch `fix/qcf-approval-token-blank-page`,
+based on older `origin/develop-dot`) was used for reference only, not
+cherry-picked, because its `.vue` hunks reference the removed CS branch.
+
+Changes made:
+
+0. `src/router/index.js`: re-added `QuotationSummaryCLToken` after
+   `PreviewQuotationSummaryCL`; `component: QuotationSummaryCL`;
+   `roles: [ADMIN, CL, MANAGEMENT]`; `redirect401: 'page-expired'` (as the other
+   token routes use; the neighbouring `quotation-summary/:qcf_number` route has no
+   `redirect401`). Not added to `publicPages`.
+1. `QuotationSummaryCLService.js`: `getQuotation(qcfNumber, token)` and
+   `getManagementQuotation(qcfNumber, token)`; `useRoute()` and its import
+   removed; URL ternary unchanged.
+2. `QuotationSummaryCL.vue`: `routeToken = computed(() => route.params.token || null)`
+   passed as the second argument at both call sites.
+3. `QuotationSummaryCL.vue`: `loading` / `error` refs; Indonesian error text set
+   before each existing navigation (401 `Sesi Anda telah berakhir. Mengalihkan...`,
+   `NOT_AUTHORIZED`, `QCF_NOT_FOUND`/404, generic); `loading` cleared in
+   `finally`; page body wrapped in `<template v-else>`; `ModalManualSourcing`
+   guarded with `!loading && !error`. Sentry call, navigation targets, `approve()`
+   and role logic unchanged. Neither the token nor raw error internals render.
+
+`PreviewQuotationSummaryCL.vue` still calls both functions with one argument; that
+is correct (its route has no `:token`, so the token is `undefined`).
+
+The sections below are the original analysis. Their line numbers refer to the
+older `develop-dot` base, and the CS branch they mention no longer exists.
+
 ## Current behavior
 
 Verified by reading the source; every claim is cited.

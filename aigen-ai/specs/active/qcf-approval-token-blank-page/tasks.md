@@ -1,5 +1,11 @@
 # Tasks — QCF approval email link opens a blank page
 
+Status 2026-10-14: Frontend 0-3 and the service tests are implemented on
+`develop-dot-clone` (uncommitted); ESLint, Vitest and `vite build` pass (see
+`test-plan.md`). Remaining: staging verification, release-branch decision, and the
+follow-ups. Root cause on this branch is the route removed by `c19bfc3` (see
+`requirements.md`); the CS branch (FR-5/AC-4) is removed as moot.
+
 All work is in `aigen-frontend`, which is a separate git repository from
 `aigen-backend`. No backend change and no migration — see `requirements.md`
 Scope.
@@ -36,7 +42,12 @@ Scope.
 
 Execute in this order.
 
-- [ ] **Frontend 1 — service signatures.** In
+- [x] **Frontend 0 — restore the route (added 2026-10-14).** In
+      `aigen-frontend/src/router/index.js`, add `QuotationSummaryCLToken`
+      (`quotation-summary/token/:token`, `QuotationSummaryCL`, roles ADMIN/CL/
+      MANAGEMENT, `redirect401: 'page-expired'`) after `PreviewQuotationSummaryCL`.
+      Not in `publicPages`. Covers FR-8, AC-10.
+- [x] **Frontend 1 — service signatures.** In
       `aigen-frontend/src/services/form/cl/QuotationSummaryCLService.js`, add a
       second `token` parameter to `getQuotation` (`:123`) and
       `getManagementQuotation` (`:149`). Delete the internal `useRoute()` calls
@@ -45,14 +56,14 @@ Execute in this order.
       else in the file uses it. A falsy token must still select the existing
       `qcf_number` URL so dashboard behavior is byte-identical.
       Covers FR-1, FR-2, FR-3, FR-4.
-- [ ] **Frontend 2 — component call sites.** In
+- [x] **Frontend 2 — component call sites.** In
       `aigen-frontend/src/features/form/cl/action/QuotationSummaryCL.vue`, pass
       `routeToken.value` as the second argument at `:181`
       (`getManagementQuotation`) and `:183` (`getQuotation`), mirroring the CS
       branch at `:179`. Do not change `qcfNumber` (`:50`) or `isManagementRole`
       (`:100`) — see BR-3. Depends on: Frontend 1.
       Covers FR-1, FR-2, FR-5.
-- [ ] **Frontend 3 — visible loading and error states.** In the same component,
+- [x] **Frontend 3 — visible loading and error states.** In the same component,
       add a `loading` ref initialised `true` and cleared in a `finally` around
       `load()`, and an `error` ref set in the `catch` (`:195-222`) before each
       navigation. Guard the template body (`:372-711`) so the page renders
@@ -74,16 +85,18 @@ Execute in this order.
 
 ## Tests
 
-- [ ] Create
+- [x] Create
       `aigen-frontend/src/services/form/cl/QuotationSummaryCLService.test.js`
       following the existing Vitest precedent in
       `aigen-frontend/src/services/form/cs/manual-sourcing/ManualSourcingService.test.js`
       (`vi.mock` on the http client). Assert the token URL is used when a token
       is passed and the `qcf_number` URL when it is not, for both `getQuotation`
       and `getManagementQuotation`. Covers AC-1, AC-2, AC-3.
-- [ ] In the same file, assert that calling either function with no active
+- [x] In the same file, assert that calling either function with no active
       component instance neither invokes `useRoute()` nor throws. Covers AC-5.
-- [ ] **If `@vue/test-utils` is approved** (see Discovery), create
+- [-] **Not done: `@vue/test-utils` was not added** (no dependency changes
+      authorised), so no component or router-resolution test exists. **If it is
+      approved** (see Discovery), create
       `aigen-frontend/src/features/form/cl/action/QuotationSummaryCL.test.js`
       asserting: CL token route calls `getQuotation` with
       `(undefined, '<placeholder-token>')`; Management token route calls
@@ -91,22 +104,24 @@ Execute in this order.
       `('QCF0009999', null)`; the CS branch still calls `getCSQuotationByToken`;
       loading and error states render and the DOM is never empty on rejection.
       Covers AC-4, AC-6, AC-7, AC-8, AC-9.
-- [ ] **If it is not approved**, record in `test-plan.md` that AC-4 and AC-6
+- [x] **Not approved**, recorded in `test-plan.md` that AC-4 and AC-6
       through AC-9 are covered by manual staging verification only, and state
       plainly that no automated test then guards the component's argument
       passing — the exact line the fix changes.
-- [ ] Use a placeholder token such as `'test-token'` in every fixture. Never a
+- [x] Use a placeholder token such as `'test-token'` in every fixture. Never a
       real token, QCF number, RFQ number, or approver email.
 - [ ] Complete the acceptance-criteria mapping in `test-plan.md` with actual
       results.
 
 ## Verification and handoff
 
-- [ ] Run `pnpm run lint` in `aigen-frontend` and record the result. The build
-      runs ESLint with `--max-warnings=0` (`package.json:7`), so warnings block
-      the release.
-- [ ] Run `pnpm run test` in `aigen-frontend` and record the result.
-- [ ] Run `pnpm run build` to confirm the lint-gated build passes.
+- [x] Run lint in `aigen-frontend` and record the result. The build runs ESLint
+      with `--max-warnings=0` (`package.json`), so warnings block the release.
+      (`pnpm` is not installed in this environment; ran `node_modules/.bin/eslint`
+      directly.)
+- [x] Run the test suite (`vitest run`) in `aigen-frontend` and record the result.
+- [x] Confirm the lint-gated build passes (`eslint . --max-warnings=0`, then
+      `vite build`, run separately).
 - [ ] Backend commands: N/A — no backend change.
 - [ ] Import-worker commands: N/A.
 - [ ] Manual staging verification: open a token link as CL and as Management,

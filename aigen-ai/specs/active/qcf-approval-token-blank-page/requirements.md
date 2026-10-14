@@ -1,10 +1,10 @@
 # Requirements — QCF approval email link opens a blank page
 
-Status: Planned
+Status: Implemented on `develop-dot-clone` (uncommitted); awaiting staging verification
 Owner: Unknown
 Repositories: frontend (`aigen-frontend`)
 Created: 2026-09-21
-Last updated: 2026-09-21
+Last updated: 2026-10-14
 
 ## Background and problem
 
@@ -23,6 +23,29 @@ QCF0000799 / RFQ0002057 with a different approver whose role was Category
 Leader, so the defect survived a previous report. Approver identities, the PR
 number, and item descriptions are omitted here per
 `aigen-ai/workflows/bug-fix.md`.
+
+### Update 2026-10-14 — actual root cause on `develop-dot-clone` / production
+
+The blank page is now explained; the "What is not yet explained" section below is
+superseded. Commit `c19bfc3` (2026-08-28) removed the `QuotationSummaryCLToken`
+route (and the CS token branch in `QuotationSummaryCL.vue`) from
+`aigen-frontend/src/router/index.js`. Production therefore has no route matching
+`/#/quotation-summary/token/:token`. The router has no catch-all route, so the
+hash resolves to nothing, nothing is rendered into `<router-view>`, and the page
+is blank before any of the F1/F2 code runs. F1/F2 below were still real defects
+(confirmed in source) and would have broken the request once the route was
+restored, so both are fixed together with the route.
+
+Consequences for this spec:
+
+- **FR-5 / AC-4 (CS read-only branch) are removed as moot.** The CS token path no
+  longer exists in the component or router after `c19bfc3`; there is nothing to
+  keep working, and this change does not re-add it.
+- The route is restored with `roles: [ADMIN, CL, MANAGEMENT]` (no `CS`) and
+  `redirect401: 'page-expired'`, and is deliberately **not** in `publicPages`
+  (BR-2 unchanged).
+- Candidate B (approver not signed in, reported as "blank") is no longer needed
+  to explain the blank page, but the login-required question below is still open.
 
 ### Confirmed defect
 
@@ -133,13 +156,18 @@ that route ever renders an empty page.
 - **FR-4:** On the dashboard route, where a `qcf_number` param is present and no
   token is, both fetches must continue to request the existing
   `/pr/{cl,management}/need_approval_qcf/<qcf_number>` URLs unchanged.
-- **FR-5:** The CS read-only branch (`QuotationSummaryCL.vue:179`) must keep
-  working unchanged.
+- **FR-5:** ~~The CS read-only branch must keep working unchanged.~~ **Removed
+  (2026-10-14):** the CS token branch was deleted by `c19bfc3`; nothing to
+  preserve.
 - **FR-6:** While the QCF is loading, the page must render a visible loading
   state rather than an empty shell.
 - **FR-7:** If loading fails for any reason, the page must render a visible error
   state until navigation away completes, so no code path can leave the page
   blank.
+- **FR-8 (added 2026-10-14):** The `QuotationSummaryCLToken` route
+  (`quotation-summary/token/:token`) must exist and render `QuotationSummaryCL`
+  for roles `ADMIN`, `CL`, `MANAGEMENT`, with `redirect401: 'page-expired'`, and
+  must not be a public page.
 
 ## Business rules
 
@@ -194,9 +222,11 @@ that route ever renders an empty page.
 - **AC-3:** Given the dashboard route with `params.qcf_number` set and no token,
   when the page loads, then the request URL is the existing non-token form and is
   unchanged from current behavior.
-- **AC-4:** Given the CS read-only token path, when the page loads, then
-  `getCSQuotationByToken` is still called with the route token and behavior is
-  unchanged.
+- **AC-4:** ~~CS read-only token path unchanged.~~ **Removed (2026-10-14)** — see
+  FR-5.
+- **AC-10 (added 2026-10-14):** Given the URL `#/quotation-summary/token/<token>`,
+  when the router resolves it, then it matches `QuotationSummaryCLToken` and
+  `QuotationSummaryCL` renders (not an empty `<router-view>`).
 - **AC-5:** Given `getQuotation` or `getManagementQuotation` called directly with
   no active component instance, when it runs, then it does not call `useRoute()`
   and does not throw or emit a Vue injection warning.
