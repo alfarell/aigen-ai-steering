@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_aigen_backend_migrations_aigen_20261012220615_create_log_sap_sync_down_sql", "label": "20261012220615-create-log-sap-sync.down.sql", "file_type": "code", "source_file": "aigen-backend/migrations/aigen/20261012220615-create-log-sap-sync.down.sql", "source_location": null}], "edges": []}
